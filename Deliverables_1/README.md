@@ -1,9 +1,9 @@
 # Router
 Project 2 (Digital Design II) supervised by Dr. Shalan
 By:
-- Fadi Dawoud
-- Eslam Soliman
-- Mohamed Abdel Hamed
+- Fadi Dawoud - 900163212
+- Eslam Soliman - 900163257
+- Mohamed Abdel Hamed - 900163202
 ***********************************************************************************************
 -> Description:
 *****************
@@ -29,18 +29,19 @@ metal layers are utilized to circumvent blockages and congestion.
 ***********************************************************************************************
 -> How to use:
 ****************
-The application is to be run and provided with input in the manner described below:
-1- 
-2- 
-3- 
+To use the global router:
+1- Compile and/or run the file (you can do it using the provided groute.exe file)
+2- You will be prompted to enter details about the global route grid and the netlist
+3- The global route cost matrix will be printed out, where each cell value corresponds to the number of nets assigned to this GCell
 ***********************************************************************************************
 -> Progress Report:
 *********************
 >> What's been done:
     - Complete, functional mechanisms and infrastructure for Global Routing using 
-    GCells
-    - Implemented mechanism for ripping and re-routing failed nets
-    - Designed model for performing Detailed Routing
+    GCells, supporting netlists with nets having more than two pins using the Soukup maze routing algorithm
+    - Implemented mechanism for ensuring routability and preventing faulty routes, as well as dynamically allocating more metal layers. 
+    - Implemented testing infrastructure (IO, Netlist generators, etc)
+    - Designed a theoretical model for performing Detailed Routing
 >> What's left to do:
     - LEF and DEF parsing
     - Developing a complete implementation for the Detailed Routing model 
