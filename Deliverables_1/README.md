@@ -14,6 +14,15 @@ Detailed Routing, after which we obtain an almost complete (almost ready for fab
 functional model for the design specified by the input DEF (Design Exchange Format) 
 and LEF (Library Exchange Format) files. 
 ***********************************************************************************************
+-> Phases of Execution:
+**************************
+1- LEF & DEF Parsing: to extract design and technology information
+2- Mapping and Initializing Extracted Data into their appropriate Data Structures
+3- Global Routing
+4- Detailed Routing
+5- Realizing Nets into Actual Wires and Vias
+6- Writeback Routed Design into DEF file
+***********************************************************************************************
 -> Algorithm:
 ***************
 For this application, the Soukup's Fast Maze Router is the base algorithm used for both 
