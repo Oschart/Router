@@ -61,6 +61,7 @@ void Cell::setj(int _j){
 
 //Setter for k
 void Cell::setk(int _k){
+
     indk = _k;
 }
 

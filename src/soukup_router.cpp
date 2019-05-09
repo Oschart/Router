@@ -18,6 +18,11 @@ vector<int> metal_directions; //directions of each metal layer
 vector<Cell> targetCells; //the list of all possible current target
 int limit; //the global maximum capacity for all Gcells
 bool first; //a flag for denoting the first round of routing for a net involving more than two pins
+vector<int> tracks;
+int n_layers;
+vector<int> tracks_per_gcell;
+
+
 
 //sets a cell as the target
 void make_target(Cell cell){
@@ -65,7 +70,6 @@ void step5 (stack<Cell>& RN, stack<Cell>& RO){
 void step3 (stack<Cell>& RN, stack<Cell>& RO, int& goto4, int& goto5, int& goto8){
     while (!RO.empty()){
         Cell cell = RO.top();
-        //picking a new target
 
         for (int i = 0 ; i < 4 ; i++){
             if (cell.dir[i]) continue; //checking if this neighbor was considered earlier

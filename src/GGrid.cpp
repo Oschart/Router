@@ -5,19 +5,26 @@ GGrid::GGrid(){
 }
 
 //constructor
-GGrid::GGrid (int W, int H, int layers_){
+GGrid::GGrid (int W, int H, int layers_, vector<int> tracks_, vector<int> tracks_per_gcell_, int mdirect_){
     layers = layers_;
     height = H;
     width = W;
     grid.resize(layers);
     for (int i = 0; i < layers; i++)
         grid[i].assign(H+2, vector<Cell>(W+2));
+    tracks = tracks_;
+    tracks_per_gcell = tracks_per_gcell_;
+    mdirect = mdirect_;
+
+
     for (int k = 0 ; k < layers ; k++)
     for (int i = 0 ; i < H+2 ; i++) for (int j = 0 ; j < W+2 ; j++) {
         grid[k][i][j].seti(i); grid[k][i][j].setj(j); grid[k][i][j].setk(k);
         if (i*j == 0 || i == H+1 || j == W+1) {grid[k][i][j].setS(7); grid[k][i][j].setC(0);}
         else {grid[k][i][j].setS(0); grid[k][i][j].setC(0);}
+
     }
+
 }
 
 //getter for height

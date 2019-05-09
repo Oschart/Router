@@ -15,6 +15,7 @@ public:
     Cell();
     Cell (char, char);
     bool dir[4];
+    vector<vector<int>> detailed;
     vector<int> nets; //indexes of the nets assigned to this
     void setS(char); //setters and getters
     void setC(char);

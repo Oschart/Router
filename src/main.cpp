@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <stack>
+#include <cmath>
 #include "soukup_router.cpp"
 #define INT_MAX 1000000000
 using namespace std;
@@ -112,18 +113,36 @@ int main() {
         }
         netlist.push_back(mynet);
     }
-    int layers = getMinLayers(netlist);
     cout << "Please enter the direction for Metal1 (0 for horizontal, 1 for vertical)" << endl;
     cout << "Higher metal layers alternate between horizontal and vertical" << endl;
     int mdirect; cin >> mdirect;
-    for (int i = 0 ; i < layers ; i++) metal_directions.push_back((i+mdirect)%2);
+
+    tracks.push_back(13);
+    tracks.push_back(50);
+    tracks.push_back(13);
+    tracks.push_back(25);
+    n_layers = tracks.size();
+    tracks_per_gcell.resize(n_layers);
+    tracks_per_gcell[n_layers-1] = (int) ceil((double)tracks[n_layers-1] /((n_layers + mdirect)%2 ? Height : Width) - 0.005);
+    int k = n_layers - 3;
+    while (k >= 0) tracks_per_gcell[k] = tracks_per_gcell[n_layers-1]*tracks[k] / tracks[n_layers-1], k-=2;
+    tracks_per_gcell[n_layers-2] = (int) ceil((double)tracks[n_layers-2] /((n_layers + mdirect)%2 ? Width : Height) - 0.005);
+    k = n_layers - 4;
+    while (k >= 0) tracks_per_gcell[k] = tracks_per_gcell[n_layers-2]*tracks[k] / tracks[n_layers-2], k-=2;
+    for (int i = 0 ; i < n_layers ; i++){
+        cout << "The number of tracks per gcell for metal " << i << " is " << tracks_per_gcell[i] << endl;
+    }
+
+
+
+    for (int i = 0 ; i < n_layers ; i++) metal_directions.push_back((i+mdirect)%2);
     cout << "Please enter the maximum capacity for each global cell" << endl;
     cin >> limit;
     //vector<net> netlist = getFakeNetlist();
     generateBoxSizes(netlist);
 
     sort(netlist.begin(), netlist.end(), comp);
-    grid = GGrid(Height, Width, layers);
+    grid = GGrid(Height, Width, n_layers, tracks, tracks_per_gcell, mdirect);
     reservePins(netlist);
     for (int i = 0 ; i < netlist.size(); i++){
         netind = i;

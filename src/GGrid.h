@@ -17,14 +17,17 @@ private:
 
 public:
     GGrid(); //default constructor
-    GGrid (int, int, int); //constructor
+    GGrid (int, int, int, vector<int>, vector<int>, int); //constructor
     vector<vector<vector<Cell>>>grid; //the actual grid
+    vector<int> tracks;
+    vector<int> tracks_per_gcell;
     int getHeight(); //getters
     int getWidth();
     int getLayers();
     void print(); //prints out the grid
     void clean(); // cleans the grid
     void addLayer(); //adds an extra layer
+    int mdirect;
 
 };
 
