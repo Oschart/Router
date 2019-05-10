@@ -1,11 +1,10 @@
-#ifndef CELL_H
-#define CELL_H
+#ifndef DCELL_H
+#define DCELL_H
 
 #include <vector>
-
 using namespace std;
 
-class Cell {
+class DCell {
 private:
     char S; // definition/traceback aid
     char C; // reach flag
@@ -13,9 +12,10 @@ private:
     int indi, indj, indk; //coordinates
 
 public:
-    Cell();
-    Cell (char, char);
+    DCell();
+    DCell (char, char);
     bool dir[4];
+    vector<vector<int>> detailed;
     vector<int> nets; //indexes of the nets assigned to this
     void setS(char); //setters and getters
     void setC(char);
@@ -32,9 +32,9 @@ public:
 
 };
 
-#include "Cell.cpp"
+#include "DCell.cpp"
 
-#endif // CELL_H
+#endif // DCELL_H
 
 
 

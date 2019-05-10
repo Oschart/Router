@@ -17,7 +17,7 @@ private:
 
 public:
     GGrid(); //default constructor
-    GGrid (int, int, int, vector<int>, vector<int>, int); //constructor
+    GGrid (int, int, int); //constructor
     vector<vector<vector<Cell>>>grid; //the actual grid
     vector<int> tracks;
     vector<int> tracks_per_gcell;
