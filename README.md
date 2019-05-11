@@ -16,12 +16,12 @@ and LEF (Library Exchange Format) files.
 ***********************************************************************************************
 -> Phases of Execution:
 **************************
-1- LEF & DEF Parsing: to extract design and technology information
-2- Mapping and Initializing Extracted Data into their appropriate Data Structures
-3- Global Routing
-4- Detailed Routing
-5- Realizing Nets into Actual Wires and Vias
-6- Writeback Routed Design into DEF file
+1- LEF & DEF Parsing: to extract design and technology information    
+2- Mapping and Initializing Extracted Data into their appropriate Data Structures    
+3- Global Routing    
+4- Detailed Routing    
+5- Realizing Nets into Actual Wires and Vias        
+6- Writeback Routed Design into DEF file    
 ***********************************************************************************************
 -> Algorithm:
 ***************
@@ -46,19 +46,19 @@ To use the global router:
 -> Progress Report:
 *********************
 >> What's been done:
-    - Complete, functional mechanisms and infrastructure for Global Routing using 
-    GCells, supporting netlists with nets having more than two pins using the Soukup maze routing algorithm
-    - Implemented mechanism for ensuring routability and preventing faulty routes, as well as dynamically allocating more metal layers
-    - Implemented testing infrastructure (IO, Netlist generators, etc)
-    - Designed a theoretical model for performing Detailed Routing
-	- Parsed about the layers and vias info from the LEF
-	- Parsed design info from the LEF file 
-	- Parsing checking for some syntax errors
->> What's left to do:
-    - Complete LEF and DEF parsing
-    - Developing a complete implementation for the Detailed Routing model 
-    - Realizing the abstracted nets using actual wires and vias
-    - Writing back the routed nets to the DEF file 
+    - Complete, functional mechanisms and infrastructure for Global Routing using    
+    GCells, supporting netlists with nets having more than two pins using the Soukup maze routing algorithm    
+    - Implemented mechanism for ensuring routability and preventing faulty routes, as well as dynamically allocating more metal layers    
+    - Implemented testing infrastructure (IO, Netlist generators, etc)    
+    - Designed a theoretical model for performing Detailed Routing    
+	- Parsed about the layers and vias info from the LEF    
+	- Parsed design info from the LEF file     
+	- Parsing checking for some syntax errors    
+>> What's left to do:    
+    - Complete LEF and DEF parsing    
+    - Developing a complete implementation for the Detailed Routing model     
+    - Realizing the abstracted nets using actual wires and vias    
+    - Writing back the routed nets to the DEF file     
 ***********************************************************************************************
 -> References:
 *****************
