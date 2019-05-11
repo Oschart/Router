@@ -14,6 +14,7 @@ vector <metal> metalLayers;
 vector <cut> cutLayers;
 vector <via> vias;
 
+string inDEF;
 
 DEF DEF_FILE;
 LEF LEF_FILE;
@@ -40,6 +41,7 @@ bool readDEF(){
 	vector <string> Buf;
 	cout << "Enter the path for the .def file: ";
 	getline(cin, source);
+    inDEF = source;
 	ifstream read(source);
 	if(!read.is_open()){
 	  cout << "Error: Unable to read the .def file.\n";

@@ -27,5 +27,7 @@ private:
     
 };
 
+#include "DEF_Writer.cpp"
+
 #endif // DEFWR_H
 

@@ -1,4 +1,4 @@
-#include "DEF_Writer.h"
+//#include "DEF_Writer.h"
 #include "DEF_Util.h"
 #include <iostream>
 
@@ -23,12 +23,12 @@ DEF_Writer::DEF_Writer(vector<metal> _metalStack, vector<vector<seg> > nets/*, D
                 //int centerOffset = nonDefWidth[mIdx]/2;
                 x1 = nets[i][j].c1 + minX;
                 x2 = nets[i][j].c2 + minX;
-                y1 = y2 = nets[i][j].trackPos + minY;
+                y1 = y2 = nets[i][j].trackIdx + minY;
                 same = 0;
             }
             else        // Vertical
             {
-                x1 = x2 = nets[i][j].trackPos + minX;
+                x1 = x2 = nets[i][j].trackIdx + minX;
                 y1 = nets[i][j].c1 + minY;
                 y2 = nets[i][j].c2 + minY;
                 same = 1;
