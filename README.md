@@ -48,11 +48,14 @@ To use the global router:
 >> What's been done:
     - Complete, functional mechanisms and infrastructure for Global Routing using 
     GCells, supporting netlists with nets having more than two pins using the Soukup maze routing algorithm
-    - Implemented mechanism for ensuring routability and preventing faulty routes, as well as dynamically allocating more metal layers. 
+    - Implemented mechanism for ensuring routability and preventing faulty routes, as well as dynamically allocating more metal layers
     - Implemented testing infrastructure (IO, Netlist generators, etc)
     - Designed a theoretical model for performing Detailed Routing
+	- Parsed about the layers and vias info from the LEF
+	- Parsed design info from the LEF file 
+	- Parsing checking for some syntax errors
 >> What's left to do:
-    - LEF and DEF parsing
+    - Complete LEF and DEF parsing
     - Developing a complete implementation for the Detailed Routing model 
     - Realizing the abstracted nets using actual wires and vias
     - Writing back the routed nets to the DEF file 
