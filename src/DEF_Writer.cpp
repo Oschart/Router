@@ -38,7 +38,7 @@ DEF_Writer::DEF_Writer(vector<metal> &_metalStack, vector<vector<seg> > nets, DE
             routed[i][j] += + " ( " + to_string(x1) + to_string(y1) + " ) ";
             if(x1 == x2 && y1 == y2)
             {
-                routed[i][j] += "M" + to_string(mIdx + 1) + "_M" + to_string(mIdx + 2);
+                routed[i][j] += "M" + to_string(mIdx + 2) + "_M" + to_string(mIdx + 1);
                 continue; 
             }
             routed[i][j] += + " ( " + (same? "*": to_string(x1)) + (same? to_string(y1): "*") + " ) ";
