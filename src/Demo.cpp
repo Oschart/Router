@@ -4,7 +4,7 @@ using namespace std;
 
 int main()
 {
-    getSegments();
-    //DEF_Writer defw(metalLayers, getSegments());
-    //defw.write_DEF(inDEF);
+    //getSegments();
+    DEF_Writer defw(metalLayers, getSegments(), DEF_FILE);
+    defw.write_DEF(inDEF);
 }

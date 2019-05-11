@@ -14,7 +14,7 @@ class DEF_Writer
 public:
 
 	// Public Member functions
-    DEF_Writer(vector<metal>, vector<vector<seg> >/*, DEF*/);
+    DEF_Writer(vector<metal>, vector<vector<seg> >, DEF);
 
     void write_DEF(string);     // Writes the routed DEF file
 	

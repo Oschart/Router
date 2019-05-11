@@ -44,87 +44,38 @@ NETS 10 ;
   ( NOR2X1_1 B ) 
   ( AOI21X1_1 A ) 
   ( OAI21X1_1 A ) 
-  ( BUFX2_1 A ) 
-+ ROUTED metal1 ( 6400 1170 ) ( * 1200 ) ( 6560 * ) 
-  NEW metal1 ( 4480 1200 ) M2_M1 
-  NEW metal2 ( 4480 1200 ) M3_M2 
-  NEW metal3 ( 4480 1200 ) ( 6080 * ) M3_M2 
-  NEW metal2 ( 6080 1200 ) ( * 1400 ) M2_M1 
-  NEW metal1 ( 6080 1400 ) ( * 1510 ) 
-  NEW metal1 ( 3040 1200 ) M2_M1 
-  NEW metal2 ( 3040 1200 ) M3_M2 
-  NEW metal3 ( 3040 1200 ) ( 4480 * ) 
-  NEW metal1 ( 3200 1400 ) ( 3040 * ) M2_M1 
-  NEW metal2 ( 3040 1400 ) ( * 1200 ) ;
+  ( BUFX2_1 A ) ;
 - dout<0>
   ( PIN dout<0> ) 
-  ( BUFX2_1 Y ) 
-+ ROUTED metal3 ( 7200 1200 ) ( 7040 * ) M3_M2 
-  NEW metal2 ( 7040 1200 ) ( * 1400 ) M2_M1 
-  NEW metal1 ( 7040 1400 ) ( 6880 * ) ;
+  ( BUFX2_1 Y ) ;
 - $auto$iopadmap.cc:164:execute$47<1>
   ( DFFPOSX1_2 Q ) 
   ( AOI21X1_1 B ) 
   ( OAI21X1_1 B ) 
-  ( BUFX2_2 A ) 
-+ ROUTED metal1 ( 640 1170 ) ( * 1200 ) ( 480 * ) 
-  NEW metal1 ( 2880 1400 ) M2_M1 
-  NEW metal2 ( 2880 1400 ) M3_M2 
-  NEW metal3 ( 2880 1400 ) ( 960 * ) M3_M2 
-  NEW metal1 ( 960 1400 ) M2_M1 
-  NEW metal1 ( 960 1400 ) ( * 1510 ) 
-  NEW metal1 ( 3360 1200 ) M2_M1 
-  NEW metal2 ( 3360 1200 ) ( * 1400 ) M3_M2 
-  NEW metal3 ( 3360 1400 ) ( 2880 * ) ;
+  ( BUFX2_2 A ) ;
 - dout<1>
   ( PIN dout<1> ) 
-  ( BUFX2_2 Y ) 
-+ ROUTED metal3 ( -160 1200 ) ( 160 * ) M3_M2 
-  NEW metal2 ( 160 1200 ) ( * 1400 ) M2_M1 ;
+  ( BUFX2_2 Y ) ;
 - reset
   ( PIN reset ) 
   ( NOR2X1_1 A ) 
-  ( INVX1_1 A ) 
-+ ROUTED metal1 ( 4160 1600 ) ( 4000 * ) 
-  NEW metal2 ( 4160 2400 ) ( * 1600 ) M2_M1 ;
+  ( INVX1_1 A ) ;
 - _1_
   ( OAI21X1_1 C ) 
-  ( INVX1_1 Y ) 
-+ ROUTED metal1 ( 3670 800 ) ( 3680 * ) ( 3840 * ) ;
+  ( INVX1_1 Y ) ;
 - _2_
   ( AOI21X1_1 C ) 
-  ( OAI21X1_1 Y ) 
-+ ROUTED metal1 ( 2560 1600 ) M2_M1 
-  NEW metal2 ( 2560 1600 ) ( * 1200 ) M3_M2 
-  NEW metal3 ( 2560 1200 ) ( 2880 * ) M4_M3 
-  NEW metal4 ( 2880 1200 ) ( 3360 * ) ( * 1000 ) M4_M3 
-  NEW metal3 ( 3360 1000 ) ( 3520 * ) M3_M2 
-  NEW metal2 ( 3520 1000 ) ( 3360 * ) M2_M1 
-  NEW metal1 ( 3360 1000 ) ( 3450 * ) ;
+  ( OAI21X1_1 Y ) ;
 - _0_<1>
   ( DFFPOSX1_2 D ) 
-  ( AOI21X1_1 Y ) 
-+ ROUTED metal1 ( 1920 1220 ) M2_M1 
-  NEW metal2 ( 1920 1200 ) ( * 1800 ) M3_M2 
-  NEW metal3 ( 1920 1800 ) ( 2720 * ) M3_M2 
-  NEW metal1 ( 2720 1800 ) M2_M1 ;
+  ( AOI21X1_1 Y ) ;
 - _0_<0>
   ( DFFPOSX1_1 D ) 
-  ( NOR2X1_1 Y ) 
-+ ROUTED metal1 ( 4800 1220 ) M2_M1 
-  NEW metal2 ( 4800 1200 ) ( * 1400 ) M3_M2 
-  NEW metal3 ( 4800 1400 ) ( 4320 * ) M3_M2 
-  NEW metal1 ( 4320 1400 ) M2_M1 ;
+  ( NOR2X1_1 Y ) ;
 - clk
   ( PIN clk ) 
   ( DFFPOSX1_2 CLK ) 
-  ( DFFPOSX1_1 CLK ) 
-+ ROUTED metal1 ( 2240 1400 ) M2_M1 
-  NEW metal2 ( 2240 1400 ) ( * 1600 ) M3_M2 
-  NEW metal3 ( 2240 1600 ) ( 4480 * ) M3_M2 
-  NEW metal2 ( 4480 1600 ) ( * 1400 ) M2_M1 
-  NEW metal1 ( 4480 1400 ) ( 4640 * ) ( 4650 * ) 
-  NEW metal2 ( 2080 2400 ) ( 2240 * ) ( * 1600 ) ;
+  ( DFFPOSX1_1 CLK ) ;
 END NETS
 
 SPECIALNETS 5 ;
