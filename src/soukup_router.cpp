@@ -18,6 +18,11 @@ vector<int> metal_directions; //directions of each metal layer
 vector<Cell> targetCells; //the list of all possible current target
 int limit; //the global maximum capacity for all Gcells
 bool first; //a flag for denoting the first round of routing for a net involving more than two pins
+vector<int> tracks;
+int n_layers;
+vector<int> tracks_per_gcell;
+
+
 
 //sets a cell as the target
 void make_target(Cell cell){
@@ -65,9 +70,9 @@ void step5 (stack<Cell>& RN, stack<Cell>& RO){
 void step3 (stack<Cell>& RN, stack<Cell>& RO, int& goto4, int& goto5, int& goto8){
     while (!RO.empty()){
         Cell cell = RO.top();
-        //picking a new target
 
         for (int i = 0 ; i < 4 ; i++){
+
             if (cell.dir[i]) continue; //checking if this neighbor was considered earlier
             RO.top().dir[i] = 1; //marking the neighbor as considered
             if (i > 1 && tk > cell.getk() && cell.getk() != 0 && cell.getk() != grid.getLayers()-1) i = 5 - i;
@@ -78,13 +83,17 @@ void step3 (stack<Cell>& RN, stack<Cell>& RO, int& goto4, int& goto5, int& goto8
             int levelj = cell.getj() + ((metal_directions[cell.getk()] || i > 1)? 0 : dj[i]);
             int leveli = cell.geti() + ((metal_directions[cell.getk()] == 0 || i > 1)? 0 : dj[i]);
             neighbor = grid.grid[levelk][leveli][levelj];
+//            cout << "current: " << endl;
+//            cout << cell.geti() << " " << cell.getj() << " " << cell.getk() << endl;
+//            cout << "new" << endl;
+//            cout << leveli << " " << levelj << " " << levelk << endl;
 
             //evaluating the neighbor
             int C = neighbor.getC(), S = neighbor.getS();
             if (C == 2 || S == 7) continue;
             if (S == 6) { neighbor_traceback = 2 + 4*(i >= 2) - i; goto8 = 1; return;}
             if (C <= 0){ //DFS / Line Search phase
-                if (abs(ti - leveli) + abs(tj - levelj) < abs(ti - cell.geti()) + abs(tj - cell.getj())){
+                if (abs(ti - leveli) + abs(tj - levelj) + abs(tk - levelk) < abs(ti - cell.geti()) + abs(tj - cell.getj())+abs(tk - cell.getk())){
                     goto5 = 1;
                     neighbor_traceback = 2 + 4*(i >= 2) - i;
                     return;
@@ -114,9 +123,15 @@ void steps67(stack<Cell>& RO, int& goto3, int& goto6, int& goto8){
         if (neighbor.getS() <= 4){
             neighbor.setS(neighbor_traceback);
         }
+
         update_grid(neighbor);
         RO.push(neighbor);
-        neighbor = grid.grid[neighbor.getk()][neighbor.geti()+(metal_directions[neighbor.getk()])*dj[dir-1]][neighbor.getj()+((metal_directions[neighbor.getk()]==0)%2)*dj[dir-1]];
+
+        if (dir < 3) neighbor = grid.grid[neighbor.getk()][neighbor.geti()+(metal_directions[neighbor.getk()])*dj[dir-1]][neighbor.getj()+((metal_directions[neighbor.getk()]==0)%2)*dj[dir-1]];
+        else neighbor = grid.grid[neighbor.getk() + (dir == 3? 1 : -1)][neighbor.geti()][neighbor.getj()];
+//        cout << "The new cell on the linesearch: " << endl;
+//        cout << neighbor.geti() << " " << neighbor.getj() << " " << neighbor.getk() << endl;
+//        cout << (int)neighbor.getS() << endl;
         int C = neighbor.getC();
         int S = neighbor.getS();
         if (C == 2 || S == 7) {goto3 = 1; break;}
@@ -133,6 +148,8 @@ vector<Cell> traceback() {
     vector<Cell> path;
     Cell father;
     path.push_back(neighbor);
+    neighbor.setS(10);
+    update_grid(neighbor);
     if (!first) {
         grid.grid[neighbor.getk()][neighbor.geti()][neighbor.getj()].incCost(netind);
         if (grid.grid[neighbor.getk()][neighbor.geti()][neighbor.getj()].getCost() == limit) {neighbor.setS(7); update_grid(neighbor);}
@@ -157,6 +174,7 @@ vector<Cell> traceback() {
             if (grid.grid[neighbor.getk()][neighbor.geti()][neighbor.getj()].getCost() == limit) {neighbor.setS(7); update_grid(neighbor);}
         }
         path.push_back(neighbor);
+        neighbor.setS(10);
         update_grid(neighbor);
         neighbor_traceback = n_traceback;
 
@@ -180,6 +198,13 @@ vector<Cell> soukup_route(Cell source){
     sk = source.getk();
     make_target(target);
     update_grid(source);
+//    cout << "source info:" << endl;
+//    cout << source.geti() << " " << source.getj() << " " << source.getk()<< " " << (int)source.getS() << endl;
+//    cout << (int)grid.grid[source.getk()][source.geti()][source.getj()].getS() << endl;
+//    cout << "target info:" << endl;
+//    cout << ti << " " << tj << " " << tk << endl;
+//    cout << (int)grid.grid[tk][ti][tj].getS() << endl;
+    target.setC(0);
     update_grid(target);
     RN.push(source);
 

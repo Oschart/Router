@@ -1,11 +1,11 @@
 //Default Constructor
-Cell::Cell(){
+DCell::DCell(){
     for (int i = 0 ; i < 4 ; i++) dir[i] = 0;
     cost = 0;
 }
 
 //Constructor
-Cell::Cell(char _S, char _C){
+DCell::DCell(char _S, char _C){
     for (int i = 0 ; i < 4 ; i++) dir[i] = 0;
     S = _S;
     C = _C;
@@ -15,66 +15,66 @@ Cell::Cell(char _S, char _C){
 }
 
 //Setter for S
-void Cell::setS(char _S){
+void DCell::setS(char _S){
     S = _S;
 }
 
 //Setter for C
-void Cell::setC(char _C){
+void DCell::setC(char _C){
     C = _C;
 }
 
 //Getter for S
-char Cell::getS(){
+char DCell::getS(){
     return S;
 }
 
 //Getter for C
-char Cell::getC(){
+char DCell::getC(){
     return C;
 }
 
 //Getter for i
-int Cell::geti(){
+int DCell::geti(){
     return indi;
 }
 
 //Getter for j
-int Cell::getj(){
+int DCell::getj(){
     return indj;
 }
-
-//Getter for k
-int Cell::getk(){
+//
+////Getter for k
+int DCell::getk(){
     return indk;
 }
 
 //Setter for i
-void Cell::seti(int _i){
+void DCell::seti(int _i){
     indi = _i;
 }
 
 //Setter for j
-void Cell::setj(int _j){
+void DCell::setj(int _j){
     indj = _j;
 }
 
-//Setter for k
-void Cell::setk(int _k){
+////Setter for k
+void DCell::setk(int _k){
 
     indk = _k;
 }
 
 //Getter for cost
-int Cell::getCost(){
+int DCell::getCost(){
     return cost;
 }
 
-//increments the cost
-void Cell::incCost(int netind){
-    if (!cost || nets[nets.size()-1] != netind){
-        nets.push_back(netind);
-        ++cost;
-    }
-}
+////increments the cost
+//void DCell::incCost(int netind){
+//    if (!cost || nets[nets.size()-1] != netind){
+//        nets.push_back(netind);
+//        ++cost;
+//    }
+//}
 

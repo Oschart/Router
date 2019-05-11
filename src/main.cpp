@@ -1,7 +1,9 @@
 #include <iostream>
 #include <algorithm>
 #include <stack>
+#include <cmath>
 #include "soukup_router.cpp"
+#include "soukup_detailed_router.cpp"
 #define INT_MAX 1000000000
 using namespace std;
 
@@ -41,14 +43,32 @@ void generateBoxSizes(vector<net>& netlist){
 }
 
 //reserves capacity for all the pins in the netlist
-void reservePins(vector<net>& netlist){
+vector<net> reservePins(vector<net>& netlist){
+    vector<net> dnetlist(netlist.size());
     for (int i = 0 ; i < netlist.size(); i++){
+        net dnet; dnet.pins.resize(netlist[i].pins.size());
         for (int j = 0 ; j < netlist[i].pins.size(); j++){
             Cell pin = netlist[i].pins[j];
-            grid.grid[pin.getk()][pin.geti()][pin.getj()].incCost(i);
-            if (grid.grid[pin.getk()][pin.geti()][pin.getj()].getCost() == limit){pin.setS(7); update_grid(pin);}
+            dnet.pins[j] = netlist[i].pins[j];
+            int gk = pin.getk();
+            int dheight = dgrid.heights[gk];
+            int dwidth = dgrid.widths[gk];
+            int gi = pin.geti() / dheight + 1;
+            int gj = pin.getj() / dwidth + 1;
+
+            //grid.grid[pin.getk()][pin.geti()][pin.getj()].incCost(i);
+            //if (grid.grid[pin.getk()][pin.geti()][pin.getj()].getCost() == limit){pin.setS(7); update_grid(pin);}
+            //grid.grid[gk][gi][gj].detailed.grid[pin.geti() % dheight][pin.getj() % dwidth].setS(7);
+            dgrid.grid[gk][pin.geti()][pin.getj()].setS(7);
+            netlist[i].pins[j].seti(gi);
+            netlist[i].pins[j].setj(gj);
+            cout << "gi = " << gi << " gj = " << gj << " gk = " << gk << endl;
+            grid.grid[gk][gi][gj].incCost(i);
+            //netlist[i].pins[j].setk(gk);
         }
+        dnetlist[i] = dnet;
     }
+    return dnetlist;
 }
 
 //generates arbitrary netlists for testing purposes
@@ -94,6 +114,7 @@ vector<net> getFakeNetlist(){
 }
 
 int main() {
+    freopen("in.txt", "r", stdin);
     cout << "Please enter the width and the height of the global routing grid" << endl;
     int Width, Height;
     cin >> Width >> Height;
@@ -112,22 +133,54 @@ int main() {
         }
         netlist.push_back(mynet);
     }
-    int layers = getMinLayers(netlist);
     cout << "Please enter the direction for Metal1 (0 for horizontal, 1 for vertical)" << endl;
     cout << "Higher metal layers alternate between horizontal and vertical" << endl;
-    int mdirect; cin >> mdirect;
-    for (int i = 0 ; i < layers ; i++) metal_directions.push_back((i+mdirect)%2);
+    cin >> mdirect;
+
+    tracks.push_back(13);
+    tracks.push_back(50);
+    tracks.push_back(13);
+    tracks.push_back(25);
+    tracks.push_back(tracks[tracks.size()-2]);
+    n_layers = tracks.size();
+    tracks_per_gcell.resize(n_layers);
+    tracks_per_gcell[n_layers-1] = (int) ceil((double)tracks[n_layers-1] /((n_layers + mdirect)%2 ? Height : Width) - 0.005);
+    int k = n_layers - 3;
+    while (k >= 0) tracks_per_gcell[k] = tracks_per_gcell[n_layers-1]*tracks[k] / tracks[n_layers-1], k-=2;
+    tracks_per_gcell[n_layers-2] = (int) ceil((double)tracks[n_layers-2] /((n_layers + mdirect)%2 ? Width : Height) - 0.005);
+    k = n_layers - 4;
+    while (k >= 0) tracks_per_gcell[k] = tracks_per_gcell[n_layers-2]*tracks[k] / tracks[n_layers-2], k-=2;
+    for (int i = 0 ; i < n_layers ; i++){
+        cout << "The number of tracks per gcell for metal " << i << " is " << tracks_per_gcell[i] << endl;
+    }
+    ratioh = tracks[1];
+    ratiov = tracks[0];
+    if ((n_layers+mdirect)%2 == 0) swap(ratioh, ratiov);
+    for (int i = 0 ; i < n_layers ; i++) metal_directions.push_back((i+mdirect)%2);
     cout << "Please enter the maximum capacity for each global cell" << endl;
     cin >> limit;
     //vector<net> netlist = getFakeNetlist();
     generateBoxSizes(netlist);
 
     sort(netlist.begin(), netlist.end(), comp);
-    grid = GGrid(Height, Width, layers);
-    reservePins(netlist);
+    cout << "About to create the grid" << endl;
+    grid = GGrid(Height, Width, n_layers);
+    dgrid = DGrid(Height, Width, n_layers, tracks, tracks_per_gcell, mdirect);
+    cout << "Done creating grid" << endl;
+//     for (int i = 0 ; i < n_layers; i++) {
+//        cout << "Layer :" << i << endl;
+//        cout << "Its height = " << grid.grid[i][1][1].detailed.getHeight() << endl;
+//        cout << "Its width = " << grid.grid[i][1][1].detailed.getWidth() << endl;
+//    }
+    cout << "done here" << endl;
+    vector<net> dnetlist = reservePins(netlist);
+    cout << netlist[0].pins[0].geti() << " " << netlist[0].pins[0].getj() << " " << netlist[0].pins[0].getk() << endl;
+    cout << netlist[0].pins[1].geti() << " " << netlist[0].pins[1].getj() << " " << netlist[0].pins[1].getk() << endl;
+    cout << "reserving successful" << endl;
     for (int i = 0 ; i < netlist.size(); i++){
         netind = i;
         Cell source = netlist[i].pins[0];
+
         int ind = getClosest(source, netlist[i].pins);
         Cell closest = netlist[i].pins[ind];
         closest.setS(6);
@@ -135,6 +188,14 @@ int main() {
         targetCells.push_back(closest);
         first = 1;
         vector<Cell> initial_path = soukup_route(source);
+        cout << "Global route successful" << endl;
+        Cell dsource = dnetlist[i].pins[0];
+        Cell dclosest = dnetlist[i].pins[ind];
+        dclosest.setS(6);
+        dupdate_grid(dclosest);
+        dtargetCells.push_back(dclosest);
+        dsoukup_route(dsource);
+        cout << "A7A" << endl;
         if (initial_path.size() == 0){metal_directions.push_back((grid.getLayers()+mdirect)%2); grid.addLayer(); initial_path = soukup_route(source);}
 
         first = 0;
@@ -148,5 +209,6 @@ int main() {
         }
     }
     grid.print();
+
     return 0;
 }
