@@ -4,13 +4,13 @@
 
 using namespace std;
 
-DEF_Writer::DEF_Writer(vector<metal> &_metalStack, vector<vector<seg> > nets, DEF def)
+DEF_Writer::DEF_Writer(vector<metal> _metalStack, vector<vector<seg> > nets/*, DEF def*/)
 {
 
     metalStack = _metalStack;
     wireSize();
-    int minX = def.dieArea[0].first;
-    int minY = def.dieArea[0].second;
+    int minX = 0;//def.dieArea[0].first;
+    int minY = 0;//def.dieArea[0].second;
     for (int i = 0; i < nets.size(); ++i)
     {
         for (int j = 0; j < nets[i].size(); j += 2)
