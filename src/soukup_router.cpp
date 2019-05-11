@@ -32,10 +32,10 @@ void make_target(Cell cell){
 }
 
 //gets the closest cell from a list of targets to a particular source cell
-int getClosest(Cell source, vector<Cell>& targets){
+int getClosest(Cell source, vector<Cell>& targets, int indx){
     int mindist = INT_MAX; int ind;
     for (int j = 0 ; j < targets.size(); j++){
-        if (source.geti() == targets[j].geti() && source.getj() == targets[j].getj() &&source.getk() == targets[j].getk()) continue;
+        if (j == indx) continue;
         int dist =  abs(source.geti()-targets[j].geti()) + \
                     abs(source.getj()-targets[j].getj()) + \
                     abs(source.getk()-targets[j].getk());
@@ -83,10 +83,6 @@ void step3 (stack<Cell>& RN, stack<Cell>& RO, int& goto4, int& goto5, int& goto8
             int levelj = cell.getj() + ((metal_directions[cell.getk()] || i > 1)? 0 : dj[i]);
             int leveli = cell.geti() + ((metal_directions[cell.getk()] == 0 || i > 1)? 0 : dj[i]);
             neighbor = grid.grid[levelk][leveli][levelj];
-//            cout << "current: " << endl;
-//            cout << cell.geti() << " " << cell.getj() << " " << cell.getk() << endl;
-//            cout << "new" << endl;
-//            cout << leveli << " " << levelj << " " << levelk << endl;
 
             //evaluating the neighbor
             int C = neighbor.getC(), S = neighbor.getS();
@@ -129,9 +125,7 @@ void steps67(stack<Cell>& RO, int& goto3, int& goto6, int& goto8){
 
         if (dir < 3) neighbor = grid.grid[neighbor.getk()][neighbor.geti()+(metal_directions[neighbor.getk()])*dj[dir-1]][neighbor.getj()+((metal_directions[neighbor.getk()]==0)%2)*dj[dir-1]];
         else neighbor = grid.grid[neighbor.getk() + (dir == 3? 1 : -1)][neighbor.geti()][neighbor.getj()];
-//        cout << "The new cell on the linesearch: " << endl;
-//        cout << neighbor.geti() << " " << neighbor.getj() << " " << neighbor.getk() << endl;
-//        cout << (int)neighbor.getS() << endl;
+
         int C = neighbor.getC();
         int S = neighbor.getS();
         if (C == 2 || S == 7) {goto3 = 1; break;}
@@ -188,23 +182,25 @@ vector<Cell> traceback() {
 vector<Cell> soukup_route(Cell source){
     if (grid.grid[source.getk()][source.geti()][source.getj()].getS() == 6) { return vector<Cell>();}
     stack<Cell> RO, RN;
-
+    vector<Cell> path;
     //marking source and target cells
     source.setS(5);
     source.setC(2);
-    Cell target = targetCells[getClosest(source, targetCells)];
+    Cell target = targetCells[getClosest(source, targetCells, -1)];
+    if (source.geti() == target.geti() && source.getj() == target.getj() && source.getk() == target.getk()){
+        source.setS(10);
+        update_grid(source);
+        path.push_back(source);
+        return path;
+    }
     si = source.geti();
     sj = source.getj();
     sk = source.getk();
     make_target(target);
     update_grid(source);
-//    cout << "source info:" << endl;
-//    cout << source.geti() << " " << source.getj() << " " << source.getk()<< " " << (int)source.getS() << endl;
-//    cout << (int)grid.grid[source.getk()][source.geti()][source.getj()].getS() << endl;
-//    cout << "target info:" << endl;
-//    cout << ti << " " << tj << " " << tk << endl;
-//    cout << (int)grid.grid[tk][ti][tj].getS() << endl;
+
     target.setC(0);
+    target.setS(6);
     update_grid(target);
     RN.push(source);
 
@@ -212,7 +208,6 @@ vector<Cell> soukup_route(Cell source){
     //each goto flag marks the next step to execute
     int goto2 = 1, goto3 = 0, goto4 = 0,  goto5 = 0, goto6 = 0, goto8 = 0;
     int found = 0;
-    vector<Cell> path;
     while (1){
         if (goto2){
             goto2 = 0;

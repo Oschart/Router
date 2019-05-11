@@ -66,50 +66,7 @@ vector<net> reservePins(vector<net>& netlist){
     return dnetlist;
 }
 
-//generates arbitrary netlists for testing purposes
-vector<net> getFakeNetlist(){
-    Cell cell1;
-    cell1.seti(1);
-    cell1.setj(1);
-    cell1.setk(0);
-    Cell cell2;
-    cell2.seti(4);
-    cell2.setj(4);
-    cell2.setk(0);
-    Cell cell3;
-    cell3.seti(3);
-    cell3.setj(4);
-    cell3.setk(0);
-    Cell cell4;
-    cell4.seti(3);
-    cell4.setj(5);
-    cell4.setk(0);
-    Cell cell5;
-    cell5.seti(3);
-    cell5.setj(9);
-    cell5.setk(0);
-    Cell cell6;
-    cell6.seti(3);
-    cell6.setj(7);
-    cell6.setk(0);
-    net net1, net2, net3;
-    net1.pins.push_back(cell1);
-    net1.pins.push_back(cell2);
-    net2.pins.push_back(cell4);
-    net2.pins.push_back(cell6);
-    net3.pins.push_back(cell5);
-    net3.pins.push_back(cell3);
-
-    vector<net> netlist;
-    netlist.push_back(net1);
-    netlist.push_back(net2);
-    netlist.push_back(net2);
-    netlist.push_back(net3);
-    return netlist;
-}
-
-
-int main() {
+vector<seg> getSegments() {
     freopen("in.txt", "r", stdin);
     //cout << "Please enter the width and the height of the global routing grid" << endl;
     int Width, Height;
@@ -206,10 +163,10 @@ int main() {
             if (j == ind) continue;
             for (auto cell : initial_path){targetCells.push_back(cell); }
             initial_path = soukup_route(netlist[i].pins[j]);
-            if (initial_path.size() == 0){cout << "Global routing failed" << endl; return -1;}
+            if (initial_path.size() == 0){cout << "Global routing failed" << endl; exit(0);}
             for (auto cell : dinitial_path){dtargetCells.push_back(cell); }
             dinitial_path = dsoukup_route(dnetlist[i].pins[j]);
-            if (dinitial_path.size() == 0){cout << "Detailed routing failed" << endl; return -1;}
+            if (dinitial_path.size() == 0){cout << "Detailed routing failed" << endl; exit(0);}
         }
         grid.cleartens();
         targetCells.clear();
@@ -222,5 +179,5 @@ int main() {
         segments[i].c1 *= metalLayers[segments[i].metalLayer + (segments[i].metalLayer == n_layers-1? -1 : 1)].pitch;
         segments[i].c2 *= metalLayers[segments[i].metalLayer + (segments[i].metalLayer == n_layers-1? -1 : 1)].pitch;
     }
-    return 0;
+    return segments;
 }

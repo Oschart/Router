@@ -26,7 +26,7 @@ DGrid::DGrid(int height_, int width_, int layers_, vector<int> tracks_, vector<i
     //grid.assign(H+2, vector<DCell>(W+2));
     for (int k = 0 ; k < layers ; k++)
     for (int i = 0 ; i < grid[k].size() ; i++) for (int j = 0 ; j < grid[k][i].size() ; j++) {
-        grid[k][i][j].seti(i); grid[k][i][j].setj(j);
+        grid[k][i][j].seti(i); grid[k][i][j].setj(j); grid[k][i][j].setk(k);
         if (i*j == 0 || i == grid[k].size()-1 || j == grid[k][i].size()-1) {grid[k][i][j].setS(7); grid[k][i][j].setC(0);}
         else {grid[k][i][j].setS(0); grid[k][i][j].setC(0);}
     }
@@ -48,5 +48,15 @@ void DGrid::clean(){
     for (int j = 0 ; j < grid[k][i].size() ; j++){
         if (grid[k][i][j].getS() < 7) grid[k][i][j].setS(0);
         grid[k][i][j].setC(0);
+    }
+}
+
+void DGrid::print(){
+    for (int k = 0 ; k < layers; k++){
+        cout << "Metal " << k+1 << endl;
+        for (int i = 1 ; i < grid[k].size()-1 ; i++){
+            for (int j = 1; j < grid[k][i].size()-1 ; j++) cout << (int)grid[k][i][j].getS(); cout << endl;
+        }
+        cout << endl;
     }
 }

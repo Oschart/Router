@@ -27,6 +27,7 @@ public:
     void print(); //prints out the grid
     void clean(); // cleans the grid
     void addLayer(); //adds an extra layer
+    void cleartens(); //removes restrictions by previous net global routes
     int mdirect;
 
 };

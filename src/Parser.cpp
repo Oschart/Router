@@ -393,9 +393,9 @@ int masin(){
 }
 
 
-int main(){
-    cout << readLEF() << endl;
-    cout << readDEF() << endl;
+//int main(){
+//    cout << readLEF() << endl;
+//    cout << readDEF() << endl;
 
 
 
@@ -446,4 +446,4 @@ int main(){
         cout << endl;
     }
     */
-}
+//}
