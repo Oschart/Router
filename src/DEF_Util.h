@@ -28,6 +28,9 @@ struct metal{
     int index;
     char dir;
     double pitch, width, spacing, offset;
+    //
+    double start, step;
+    int numTracks;
 
 };
 

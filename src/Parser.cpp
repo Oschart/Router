@@ -137,12 +137,28 @@ bool readDEF(){
                 index += 2;
 
 			}
+
+			else if(Buf[index] == "TRACKS"){
+               if(Buf.size() > index + 9 && Buf[index + 3] == "DO" && Buf[index + 5] == "STEP" && Buf[index + 7] == "LAYER" && Buf[index + 9] == ";"){
+                    int metal_index = metalTable[Buf[8]];
+
+                    metalLayers[metal_index].start = stod(Buf[2]);
+                    metalLayers[metal_index].numTracks = stoi(Buf[4]);
+                    metalLayers[metal_index].step = stod(Buf[6]);
+
+                    index += 10;
+
+                }
+                else {
+                    cout << "Undefined parameters list after \"TRACKS\"\n";
+                    return 0;
+                }
+			}
 			else index = Buf.size();
 		}
     getline(read, buf);
 	}
 	return 1;
-
 
 }
 
@@ -379,6 +395,10 @@ int masin(){
 
 int main(){
     cout << readLEF() << endl;
+    cout << readDEF() << endl;
+
+
+
     /*
     cout << "LEF SECTION" << endl;
     cout << "CHARS    " << LEF_FILE.bus_left << "    " << LEF_FILE.bus_right << endl;
@@ -386,13 +406,18 @@ int main(){
     cout << LEF_FILE.div << endl;
     cout << LEF_FILE.ver << endl;
     cout << "METALS SECTION" << endl;
-    for(int i = 0; i < metalLayers.size(); i++){
+       for(int i = 0; i < metalLayers.size(); i++){
         cout << metalLayers[i].dir << endl;
         cout << metalLayers[i].index << endl;
         cout << metalLayers[i].offset << endl;
         cout << metalLayers[i].pitch << endl;
         cout << metalLayers[i].spacing << endl;
         cout << metalLayers[i].width << endl;
+        cout << "FROM THE DEF" << endl;
+        cout << metalLayers[i].start << endl;
+        cout << metalLayers[i].numTracks << endl;
+        cout << metalLayers[i].step << endl;
+
     }
     for(int i = 0; i < cutLayers.size(); i++){
         cout << cutLayers[i].index << endl;
