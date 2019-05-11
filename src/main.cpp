@@ -211,6 +211,8 @@ int main() {
             dinitial_path = dsoukup_route(dnetlist[i].pins[j]);
             if (dinitial_path.size() == 0){cout << "Detailed routing failed" << endl; return -1;}
         }
+        segments.push_back(current);
+        current.clear();
         grid.cleartens();
         targetCells.clear();
         dtargetCells.clear();
@@ -218,9 +220,11 @@ int main() {
     grid.print();
     dgrid.print();
     for (int i = 0 ; i < segments.size(); i++){
-        segments[i].trackIdx *= metalLayers[segments[i].metalLayer].pitch;
-        segments[i].c1 *= metalLayers[segments[i].metalLayer + (segments[i].metalLayer == n_layers-1? -1 : 1)].pitch;
-        segments[i].c2 *= metalLayers[segments[i].metalLayer + (segments[i].metalLayer == n_layers-1? -1 : 1)].pitch;
+        for (int j = 0; j < segments[i].size(); j++){
+            segments[i][j].trackIdx *= metalLayers[segments[i][j].metalLayer].pitch;
+            segments[i][j].c1 *= metalLayers[segments[i][j].metalLayer + (segments[i][j].metalLayer == n_layers-1? -1 : 1)].pitch;
+            segments[i][j].c2 *= metalLayers[segments[i][j].metalLayer + (segments[i][j].metalLayer == n_layers-1? -1 : 1)].pitch;
+        }
     }
     return 0;
 }

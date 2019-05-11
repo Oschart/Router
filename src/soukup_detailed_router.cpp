@@ -19,7 +19,8 @@ vector<Cell> dtargetCells; //the list of all possible current target
 //
 //};
 
-vector<seg> segments;
+vector<vector<seg>> segments;
+vector<seg> current;
 
 
 //sets a cell as the target
@@ -174,7 +175,7 @@ vector<Cell> dtraceback() {
                 myseg.c2 = c2-1;
                 myseg.metalLayer = layer;
                 myseg.trackIdx = idx;
-                segments.push_back(myseg);
+                current.push_back(myseg);
 //                cout << "c1 = " << c1 << endl;
 //                cout << "c2 = " << c2 << endl;
 //                cout << "layer = " << layer << endl;
@@ -188,7 +189,7 @@ vector<Cell> dtraceback() {
             myseg.c2 = c2-1;
             myseg.metalLayer = layer;
             myseg.trackIdx = idx;
-            segments.push_back(myseg);
+            current.push_back(myseg);
 //            cout << "c1 = " << c1 << endl;
 //            cout << "c2 = " << c2 << endl;
 //            cout << "layer = " << layer << endl;
@@ -237,7 +238,7 @@ vector<Cell> dtraceback() {
             myseg.c2 = c2-1;
             myseg.metalLayer = layer;
             myseg.trackIdx = idx;
-            segments.push_back(myseg);
+            current.push_back(myseg);
 //            cout << "c1 = " << c1 << endl;
 //            cout << "c2 = " << c2 << endl;
 //            cout << "layer = " << layer << endl;
