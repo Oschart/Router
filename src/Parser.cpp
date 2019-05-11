@@ -3,49 +3,9 @@
 #include <vector>
 #include <fstream>
 #include <map>
+#include "DEF_Util.h"
 
 using namespace std;
-
-struct via{
-    bool Default;
-    int botLayerIndex, cutLayerIndex, topLayerIndex;
-    vector <pair<double, double> > botLayerShape, cutLayerShape, topLayerShape;
-};
-
-struct cut{
-    int index;
-    double spacing;
-};
-
-struct metal{
-    int index;
-    char dir;
-    double pitch, width, spacing, offset;
-
-};
-
-struct pin{
-
-};
-
-struct macro{
-    string name;
-    pair<double, double> size;
-
-};
-
-struct LEF{
-    string ver;
-    char div, bus_left, bus_right;
-    int database;
-};
-
-struct DEF{
-	string ver, design, tech;
-	char div, bus_left, bus_right;
-	int unit;
-	vector<pair<int,int> > dieArea;
-};
 
 map <string, int> metalTable;
 map <string, int> cutTable;
@@ -270,7 +230,8 @@ void readLayer(ifstream &read, string name){
             Buf = Extract(buf);
             while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == name)){
                 if(Buf.size() == 3 && Buf[2] == ";"){
-                    if(Buf[0] == "PITCH") newMetal.pitch = stod(Buf[1]);
+                    if(Buf[0] == "DIRECTION") newMetal.dir = Buf[1][0];
+                    else if(Buf[0] == "PITCH") newMetal.pitch = stod(Buf[1]);
                     else if(Buf[0] == "WIDTH") newMetal.width = stod(Buf[1]);
                     else if(Buf[0] == "SPACING") newMetal.spacing = stod(Buf[1]);
                     else if(Buf[0] == "OFFSET") newMetal.offset = stod(Buf[1]);
@@ -278,6 +239,7 @@ void readLayer(ifstream &read, string name){
                 getline(read, buf);
                 Buf = Extract(buf);
             }
+            newMetal.label = name;
             newMetal.index = metalLayers.size();
             metalTable[name] = metalLayers.size();
             metalLayers.push_back(newMetal);
@@ -293,6 +255,7 @@ void readLayer(ifstream &read, string name){
                 getline(read, buf);
                 Buf = Extract(buf);
             }
+            newCut.label = name;
             newCut.index = cutLayers.size();
             cutTable[name] = cutLayers.size();
             cutLayers.push_back(newCut);
@@ -391,7 +354,7 @@ bool readLEF(){
 
             else if(Buf[index] == "MACRO"){
                 if(Buf.size() > index + 1){
-                    readMacro(read, Buf[1]);
+                    //readMacro(read, Buf[1]);
 
                 }
                 else{
@@ -408,13 +371,13 @@ bool readLEF(){
 	return 1;
 }
 
-int main(){
+int masin(){
 
 
 }
 
 
-int masin(){
+int main(){
     cout << readLEF() << endl;
     /*
     cout << "LEF SECTION" << endl;
