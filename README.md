@@ -51,8 +51,8 @@ To use the global router:
     - Implemented mechanism for ensuring routability and preventing faulty routes, as well as dynamically allocating more metal layers    
     - Implemented testing infrastructure (IO, Netlist generators, etc)    
     - Designed a theoretical model for performing Detailed Routing    
-	- Parsed about the layers and vias info from the LEF    
-	- Parsed design info from the LEF file     
+	- Parsed the layers and vias info from the LEF    
+	- Parsed design info from the DEF file     
 	- Parsing checking for some syntax errors    
 >> What's left to do:    
     - Complete LEF and DEF parsing    
