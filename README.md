@@ -66,7 +66,8 @@ To run this milestone's code:
     - Fully implemented DEF_Writer 
 * *What's left to do:*    
     - Complete LEF parsing    
-    - DEF Writer Optimization     
+    - DEF Writer Optimization  
+    - Full mechanism for ripping routes   
 ***********************************************************************************************
 **References:**
 ---------------
