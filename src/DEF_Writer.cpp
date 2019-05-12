@@ -4,19 +4,18 @@
 
 using namespace std;
 
-DEF_Writer::DEF_Writer(vector<metal> _metalStack, vector<vector<seg> > nets/*, DEF def*/)
+DEF_Writer::DEF_Writer(vector<metal> _metalStack, vector<vector<seg> > nets)
 {
     metalStack = _metalStack;
     wireSize();
-    int minX = 0;//def.dieArea[0].first;
-    int minY = 0;//def.dieArea[0].second;
+    int minX = 0; //def.dieArea[0].first;
+    int minY = 0; //def.dieArea[0].second;
     routed.resize(nets.size());
     for (int i = 0; i < nets.size(); ++i)
     {
         routed[i].resize(nets[i].size());
         for (int j = 0; j < nets[i].size(); j++)
         {
-          //  cout << "i = " << i << " j = " << j << endl;
             int mIdx = nets[i][j].metalLayer;
             int x1, x2, y1, y2;
             bool same;
@@ -74,13 +73,13 @@ void DEF_Writer::write_DEF(string inFile)
             token = token.substr(1);
         if (token.substr(0, 4) == "NETS")
         {
-            
+            k = 0;
             while (getline(in, token) && token.find("END NETS") == string::npos)
             {
+                
                 if (token.find(";") != string::npos)
                 {
                     out << token.substr(0, token.find(";")) << endl;
-                    k = 0;
                     out << "+ ROUTED " << routed[k][0] << endl;
                     for(int i = 1; i < routed[k].size(); ++i)
                     {
@@ -89,11 +88,12 @@ void DEF_Writer::write_DEF(string inFile)
                         out << endl;
                     }
                     //
-
+                    if(k < routed.size()-1)
+                    ++k;
                 }
                 else
                     out << token << endl;
-            ++k;
+            
             }
         }
     }
