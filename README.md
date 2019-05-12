@@ -42,6 +42,14 @@ To use the global router:
 1- Compile and/or run the file (you can do it using the provided groute.exe file)
 2- You will be prompted to enter details about the global route grid and the netlist
 3- The global route cost matrix will be printed out, where each cell value corresponds to the number of nets assigned to this GCell
+
+To run this milestone's code:
+1- Insert your test case file in a file called "in.txt"
+2- Open cmd (e.g. PowerShell)
+3- Navigate to the project directory 
+4- Run the command "g++ -o Demo Demo.cpp" to compile
+5- Insert "./Demo" to run
+6- Routing output appears to the console, Routed DEF is written to the file specified in "in.txt" 
 ***********************************************************************************************
 -> Progress Report:
 *********************
@@ -50,15 +58,15 @@ To use the global router:
     GCells, supporting netlists with nets having more than two pins using the Soukup maze routing algorithm    
     - Implemented mechanism for ensuring routability and preventing faulty routes, as well as dynamically allocating more metal layers    
     - Implemented testing infrastructure (IO, Netlist generators, etc)    
-    - Designed a theoretical model for performing Detailed Routing    
+    - Designed a theoretical model for performing Detailed Routing  
+    - Developed a complete implementation for the Detailed Routing model       
 	- Parsed the layers and vias info from the LEF    
 	- Parsed design info from the DEF file     
-	- Parsing checking for some syntax errors    
+	- Parsing checking for some syntax errors   
+    - Fully implemented DEF_Writer 
 >> What's left to do:    
-    - Complete LEF and DEF parsing    
-    - Developing a complete implementation for the Detailed Routing model     
-    - Realizing the abstracted nets using actual wires and vias    
-    - Writing back the routed nets to the DEF file     
+    - Complete LEF parsing    
+    - DEF Writer Optimization     
 ***********************************************************************************************
 -> References:
 *****************
