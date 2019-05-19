@@ -1,5 +1,6 @@
 //#include "DEF_Writer.h"
 #include "DEF_Util.h"
+#include "Parser.cpp"
 #include <iostream>
 
 using namespace std;
@@ -8,8 +9,8 @@ DEF_Writer::DEF_Writer(vector<metal> _metalStack, vector<vector<seg> > nets)
 {
     metalStack = _metalStack;
     wireSize();
-    int minX = 0; //def.dieArea[0].first;
-    int minY = 0; //def.dieArea[0].second;
+    int minX = DEF_FILE.dieArea[0].first;
+    int minY = DEF_FILE.dieArea[0].second;
     routed.resize(nets.size());
     for (int i = 0; i < nets.size(); ++i)
     {
