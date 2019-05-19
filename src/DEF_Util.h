@@ -5,6 +5,12 @@
 using namespace std;
 
 
+struct RECT
+{
+    int metalLayer;
+    int x1, y1, x2, y2;
+};
+
 struct seg
 {
     int metalLayer, trackIdx;
