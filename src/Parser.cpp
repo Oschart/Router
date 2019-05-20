@@ -137,10 +137,11 @@ void readNets(ifstream &read, int num){
             }while(!(Buf.size() == 5 && Buf[4] == ";"));
 
 
-            vector<vector<RECT> > pins_temp;
-            vector<RECT> rects_temp;
 
             if(routable){
+
+                vector<vector<RECT> > pins_temp;
+                vector<RECT> rects_temp;
 
                 for(int i = 0; i < pins.size(); i++){
                     rects_temp = macros[components[pins[i].first].macro].pins[pins[i].second].ports;
@@ -181,10 +182,6 @@ void readNets(ifstream &read, int num){
                     }
                     pins_temp.push_back(rects_temp);
                 }
-                nets.push_back(pins_temp);
-            }
-            else{
-                pins_temp.clear();
                 nets.push_back(pins_temp);
             }
 
