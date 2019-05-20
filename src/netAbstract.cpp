@@ -18,7 +18,6 @@ void abstractNets()
         absNets[i].resize(nets[i].size());
         for (int j = 0; j < nets[i].size(); ++j)
         {
-            absNets[i].resize(nets[i][j].size());
             for (int k = 0; k < nets[i][j].size(); ++k)
             {
                 vector<int> X, Y;
@@ -41,6 +40,8 @@ void abstractNets()
                 int vTrackIdx = (temp.x1 - vMetal.start + vMetal.step / 2) / vMetal.step;
                 int vTrackPos = vMetal.start - vMetal.step / 2 + vTrackIdx * vMetal.step;
 
+                if(temp.x1 >= temp.x2 || temp.y1 >= temp.y2) 
+                    cout << "Error at " << i << ", " << j << endl;
                 while (hTrackPos <= temp.y2)
                 {
                     X.push_back(hTrackIdx);
@@ -55,6 +56,8 @@ void abstractNets()
                     vTrackPos += vMetal.step;
                 }
 
+                if(!X.size() || !Y.size()) cout << "Error at " << i << ", " << j << endl;
+
                 Cell aux;
                 for (int I = 0; I < X.size(); ++I)
                 {
@@ -64,6 +67,8 @@ void abstractNets()
                         absNets[i][j].push_back(aux);
                     }
                 }
+                cout << "Size = " << absNets[i][j].size() << endl;
+                if(absNets[i][j].size() == 0) cout << "Error at " << i << ", " << j << endl;
             }
         }
     }
