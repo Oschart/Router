@@ -12,15 +12,6 @@ TRACKS X -480.0 DO 50 STEP 160.0 LAYER metal2 ;
 TRACKS Y 0.0 DO 13 STEP 200 LAYER metal3 ;
 TRACKS X -480.0 DO 25 STEP 320.0 LAYER metal4 ;
 
-NONDEFAULTRULES 1 ;
-- LayerScaleRule 
-+ LAYER metal1 WIDTH 59 
-+ LAYER metal2 WIDTH 59 
-+ LAYER metal3 WIDTH 59 
-+ LAYER metal4 WIDTH 219 ;
-END NONDEFAULTRULES 
-
-
 COMPONENTS 8 ;
 - BUFX2_2 BUFX2 + PLACED ( 80.0 100 ) S ;
 - DFFPOSX1_2 DFFPOSX1 + PLACED ( 560.0 100 ) S ;
@@ -129,24 +120,42 @@ NETS 10 ;
  NEW metal2 TAPERRULE LayerScaleRule  ( 4720 1900 )  ( * 1300 ) 
  NEW metal1 TAPERRULE LayerScaleRule  ( 560 6500 ) M2_M1
  NEW metal1 TAPERRULE LayerScaleRule  ( 4720 1300 )  ( 4880 * )  ;
-
- END NETS
+END NETS 
 
 SPECIALNETS 5 ;
 - $auto$iopadmap.cc:164:execute$47<0>
 + ROUTED metal1 80 ( 6400 1140 ) ( * 1230 ) 
-  NEW metal1 80 ( 6080 1370 ) ( * 1540 ) ;
+  NEW metal1 80 ( 6080 1370 ) ( * 1540 ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 2640 1300 )  ( 2320 * ) 
+ ; 
 - $auto$iopadmap.cc:164:execute$47<1>
 + ROUTED metal1 80 ( 640 1140 ) ( * 1230 ) 
-  NEW metal1 80 ( 960 1370 ) ( * 1540 ) ;
+  NEW metal1 80 ( 960 1370 ) ( * 1540 ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 3920 900 )  ( 3760 * ) 
+ ; 
 - clk
-;
+
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 4400 1900 )  ( 4720 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 4720 1900 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 4720 1900 )  ( * 1300 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 560 6500 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 4720 1300 )  ( 4880 * )  ;
 - _1_
-;
+
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 4400 1900 )  ( 4720 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 4720 1900 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 4720 1900 )  ( * 1300 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 560 6500 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 4720 1300 )  ( 4880 * )  ;
 - _2_
 + ROUTED metal4 120 ( 3360 1200 ) ( * 1000 ) 
-  NEW metal1 80 ( 3330 1000 ) ( 3480 * ) ;
+  NEW metal1 80 ( 3330 1000 ) ( 3480 * ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 4400 1900 )  ( 4720 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 4720 1900 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 4720 1900 )  ( * 1300 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 560 6500 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 4720 1300 )  ( 4880 * )  ;
 END SPECIALNETS
 
 END DESIGN
-
+END NETS 
