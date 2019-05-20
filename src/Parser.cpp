@@ -17,6 +17,7 @@ vector <metal> metalLayers;
 vector <cut> cutLayers;
 vector <via> vias;
 vector <RECT> obs;
+vector<vector<vector<RECT> > > nets;
 
 string inDEF;
 
@@ -114,6 +115,81 @@ void readComponents(ifstream &read, int num){
     if(done != num){
         cout << "Warning: The components list is not equal to " << num << " as stated at the beginning of the components section\n";
     }
+}
+
+void readNets(ifstream &read, int num){
+    string buf;
+    vector <string> Buf;
+
+    getline(read, buf);
+    Buf = Extract(buf);
+    while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == "NETS")){
+        if(Buf.size() == 2 && Buf[0] == "-"){
+            vector<pair<string, string> > pins;
+            bool routable = 1;
+            do{
+                getline(read, buf);
+                Buf = Extract(buf);
+                if(Buf.size() >= 4 && Buf[0] == "(" && Buf[3] == ")"){
+                    if(Buf[1] == "PIN")routable = 0;
+                    pins.push_back(make_pair(Buf[1], Buf[2]));
+                }
+            }while(!(Buf.size() == 5 && Buf[4] == ";"));
+
+
+            if(routable){
+
+                vector<vector<RECT> > pins_temp;
+                vector<RECT> rects_temp;
+
+                for(int i = 0; i < pins.size(); i++){
+                    rects_temp = macros[components[pins[i].first].macro].pins[pins[i].second].ports;
+                    int x_pos = components[pins[i].first].x_pos;
+                    int y_pos = components[pins[i].first].y_pos;
+                    int width = macros[components[pins[i].first].macro].width;
+                    int height = macros[components[pins[i].first].macro].height;
+                    string orient = components[pins[i].first].orientation;
+
+                    for(int j = 0; j < rects_temp.size(); j++){
+
+                        if(orient == "N"){
+                            rects_temp[j].x1 = rects_temp[j].x1 + x_pos;
+                            rects_temp[j].y1 = rects_temp[j].y1 + y_pos;
+                            rects_temp[j].x2 = rects_temp[j].x2 + x_pos;
+                            rects_temp[j].y2 = rects_temp[j].y2 + y_pos;
+                        }
+                        else if(orient == "FN"){
+                            rects_temp[j].x1 = (width - rects_temp[j].x1) + x_pos;
+                            rects_temp[j].y1 = rects_temp[j].y1 + y_pos;
+                            rects_temp[j].x2 = (width - rects_temp[j].x2) + x_pos;
+                            rects_temp[j].y2 = rects_temp[j].y2 + y_pos;
+                        }
+                        else if(orient == "FS"){
+                            rects_temp[j].x1 = rects_temp[j].x1 + x_pos;
+                            rects_temp[j].y1 = (height - rects_temp[j].y1) + y_pos;
+                            rects_temp[j].x2 = rects_temp[j].x2 + x_pos;
+                            rects_temp[j].y2 = (height - rects_temp[j].y2) + y_pos;
+                        }
+                        else if(orient == "S"){
+                            rects_temp[j].x1 = (width - rects_temp[j].x1) + x_pos;
+                            rects_temp[j].y1 = (height - rects_temp[j].y1) + y_pos;
+                            rects_temp[j].x2 = (width - rects_temp[j].x2) + x_pos;
+                            rects_temp[j].y2 = (height - rects_temp[j].y2) + y_pos;
+                        }
+
+                        rects_temp[j] = fix(rects_temp[j]);
+                    }
+                    pins_temp.push_back(rects_temp);
+                }
+                nets.push_back(pins_temp);
+            }
+
+        }
+        getline(read, buf);
+        Buf = Extract(buf);
+    }
+
+
 }
 
 bool readDEF(){
@@ -241,6 +317,11 @@ bool readDEF(){
 
                 index = Buf.size();
 			}
+			else if(Buf.size() > index + 2 && Buf[index] == "NETS" && Buf[index + 2] == ";"){
+                readNets(read, stod(Buf[1]));
+
+                index = Buf.size();
+			}
 			else index = Buf.size();
 		}
     getline(read, buf);
@@ -303,10 +384,10 @@ void readPin(ifstream &read, string name, macro &newMacro){
         else if(Buf.size() == 6 && Buf[0] == "RECT" && Buf[5] == ";" && layer > -1){
             RECT newRECT;
             newRECT.metalLayer = layer;
-            newRECT.x1 = round(stod(Buf[1]) * LEF_FILE.unit);
-            newRECT.y1 = round(stod(Buf[2]) * LEF_FILE.unit);
-            newRECT.x2 = round(stod(Buf[3]) * LEF_FILE.unit);
-            newRECT.y2 = round(stod(Buf[4]) * LEF_FILE.unit);
+            newRECT.x1 = round(stod(Buf[1]) * 100);
+            newRECT.y1 = round(stod(Buf[2]) * 100);
+            newRECT.x2 = round(stod(Buf[3]) * 100);
+            newRECT.y2 = round(stod(Buf[4]) * 100);
             newPin.ports.push_back(newRECT);
         }
         getline(read, buf);
@@ -644,6 +725,25 @@ bool readLEF(){
     for(int i = 0; i < obs.size(); i++){
         cout << "In layer " << obs[i].metalLayer << " Rectangle " << obs[i].x1 << " " << obs[i].y1 << " " << obs[i].x2 << " " << obs[i].y2 << endl;
     }
+
+     cout << "\nComponents Section\n";
+    for(auto i = components.begin(); i != components.end(); i++){
+        component t = i->second;
+        cout << t.instance << " from the cell " << t.macro << " . Positioned in " << t.x_pos << ", " << t.y_pos << " as " << t.orientation << endl;
+    }
+
+    cout << "\n\nNets Section\n";
+    for(int i = 0; i < nets.size(); i++){
+        cout << "NET #" << i + 1 << endl;
+        for(int j = 0; j < nets[i].size(); j++){
+            cout << "\tPORT #" << j + 1 << endl;
+            for(int k = 0; k < nets[i][j].size(); k++){
+                cout << "\t\tRECT @" << nets[i][j][k].metalLayer << " COO " << nets[i][j][k].x1 << " " << nets[i][j][k].y1 << " " << nets[i][j][k].x2 << " " << nets[i][j][k].y2 << endl;
+            }
+        }
+    }
+
+
     */
 
 //}
