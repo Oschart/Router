@@ -24,15 +24,16 @@ void abstractNets()
             {
                 vector<int> X, Y;
                 RECT temp = nets[i][j][k];
-                metal hMetal, vMetal;         // Horizontal and Vertical metal layers
+                metal hMetal, vMetal; // Horizontal and Vertical metal layers
+                int nextLayer = (temp.metalLayer < metalLayers.size() - 1 ? 1 : -1) + temp.metalLayer;
                 if (temp.metalLayer % 2 == 0) // Metal layer is horizontal
                 {
                     hMetal = metalLayers[temp.metalLayer];
-                    vMetal = metalLayers[temp.metalLayer + 1];
+                    vMetal = metalLayers[nextLayer];
                 }
                 else
                 {
-                    hMetal = metalLayers[temp.metalLayer - 1];
+                    hMetal = metalLayers[nextLayer];
                     vMetal = metalLayers[temp.metalLayer];
                 }
 
@@ -57,7 +58,7 @@ void abstractNets()
                 Cell aux;
                 for (int I = 0; I < X.size(); ++I)
                 {
-                    for (int J = 0; J < Y.size; ++J)
+                    for (int J = 0; J < Y.size(); ++J)
                     {
                         aux.seti(X[I] + 1), aux.setj(Y[J] + 1), aux.setk(temp.metalLayer);
                         absNets[i][j].push_back(aux);
@@ -68,21 +69,22 @@ void abstractNets()
     }
 }
 
-void abstractObs()      // Abstract Obstructions
+void abstractObs() // Abstract Obstructions
 {
     for (int k = 0; k < obs.size(); ++k)
     {
         vector<int> X, Y;
         RECT temp = obs[k];
-        metal hMetal, vMetal;         // Horizontal and Vertical metal layers
+        metal hMetal, vMetal; // Horizontal and Vertical metal layers
+        int nextLayer = (temp.metalLayer < metalLayers.size() - 1 ? 1 : -1) + temp.metalLayer;
         if (temp.metalLayer % 2 == 0) // Metal layer is horizontal
         {
             hMetal = metalLayers[temp.metalLayer];
-            vMetal = metalLayers[temp.metalLayer + 1];
+            vMetal = metalLayers[nextLayer];
         }
         else
         {
-            hMetal = metalLayers[temp.metalLayer - 1];
+            hMetal = metalLayers[nextLayer];
             vMetal = metalLayers[temp.metalLayer];
         }
 
@@ -107,7 +109,7 @@ void abstractObs()      // Abstract Obstructions
         Cell aux;
         for (int I = 0; I < X.size(); ++I)
         {
-            for (int J = 0; J < Y.size; ++J)
+            for (int J = 0; J < Y.size(); ++J)
             {
                 aux.seti(X[I] + 1), aux.setj(Y[J] + 1), aux.setk(temp.metalLayer);
                 absObs.push_back(aux);
