@@ -1,15 +1,14 @@
 #include <iostream>
 #include <vector>
 #include "Cell.h"
-//#include "DEF_Util.h"
 #include "Parser.cpp"
 
 using namespace std;
 
 vector<vector<vector<Cell>>> absNets;
 vector<Cell> absObs;
-//vector<RECT> obs;
 
+// Method that abstracts physical pins into abstract (grid) pins
 void abstractNets()
 {
     absNets.resize(nets.size());
@@ -29,19 +28,22 @@ void abstractNets()
                     hMetal = metalLayers[temp.metalLayer];
                     vMetal = metalLayers[nextLayer];
                 }
-                else
+                else // Metal layer is vertical
                 {
                     hMetal = metalLayers[nextLayer];
                     vMetal = metalLayers[temp.metalLayer];
                 }
 
+                // Track index of first horizontal metal track whose field crosses the rectangle
                 int hTrackIdx = (temp.y1 - hMetal.start + hMetal.step / 2) / hMetal.step;
+                // Track position of first horizontal metal track whose field crosses the rectangle
                 int hTrackPos = hMetal.start - hMetal.step / 2 + hTrackIdx * hMetal.step;
+                // Track index of first vertical metal track whose field crosses the rectangle
                 int vTrackIdx = (temp.x1 - vMetal.start + vMetal.step / 2) / vMetal.step;
+                // Track position of first vertical metal track whose field crosses the rectangle
                 int vTrackPos = vMetal.start - vMetal.step / 2 + vTrackIdx * vMetal.step;
 
-                if(temp.x1 >= temp.x2 || temp.y1 >= temp.y2) 
-                    cout << "Error at " << i << ", " << j << endl;
+                // Until you reach the end of the rectangle vertically
                 while (hTrackPos <= temp.y2)
                 {
                     X.push_back(hTrackIdx);
@@ -49,6 +51,7 @@ void abstractNets()
                     hTrackPos += hMetal.step;
                 }
 
+                // Until you reach the end of the rectangle horizontally
                 while (vTrackPos <= temp.x2)
                 {
                     Y.push_back(vTrackIdx);
@@ -56,9 +59,8 @@ void abstractNets()
                     vTrackPos += vMetal.step;
                 }
 
-                if(!X.size() || !Y.size()) cout << "Error at " << i << ", " << j << endl;
-
-                Cell aux;
+                Cell aux; // Auxiliary cell that represents an abstract cell
+                // Pair the x and y coordinates together to form grid points
                 for (int I = 0; I < X.size(); ++I)
                 {
                     for (int J = 0; J < Y.size(); ++J)
@@ -67,13 +69,16 @@ void abstractNets()
                         absNets[i][j].push_back(aux);
                     }
                 }
-                if(absNets[i][j].size() == 0) cout << "Error at " << i << ", " << j << endl;
+                // Check if no cells were realized
+                if (absNets[i][j].size() == 0)
+                    cout << "Error at " << i << ", " << j << endl;
             }
         }
     }
 }
 
-void abstractObs() // Abstract Obstructions
+// Method that abstracts physical blockages into abstract (grid) obstacles
+void abstractObs()
 {
     for (int k = 0; k < obs.size(); ++k)
     {
@@ -86,17 +91,21 @@ void abstractObs() // Abstract Obstructions
             hMetal = metalLayers[temp.metalLayer];
             vMetal = metalLayers[nextLayer];
         }
-        else
+        else // Metal layer is horizontal
         {
             hMetal = metalLayers[nextLayer];
             vMetal = metalLayers[temp.metalLayer];
         }
-
+        // Track index of first horizontal metal track whose field crosses the rectangle
         int hTrackIdx = (temp.y1 - hMetal.start + hMetal.step / 2) / hMetal.step;
+        // Track position of first horizontal metal track whose field crosses the rectangle
         int hTrackPos = hMetal.start - hMetal.step / 2 + hTrackIdx * hMetal.step;
+        // Track index of first vertical metal track whose field crosses the rectangle
         int vTrackIdx = (temp.x1 - vMetal.start + vMetal.step / 2) / vMetal.step;
+        // Track position of first vertical metal track whose field crosses the rectangle
         int vTrackPos = vMetal.start - vMetal.step / 2 + vTrackIdx * vMetal.step;
 
+        // Until you reach the end of the rectangle vertically
         while (hTrackPos <= temp.y2)
         {
             X.push_back(hTrackIdx);
@@ -104,6 +113,7 @@ void abstractObs() // Abstract Obstructions
             hTrackPos += hMetal.step;
         }
 
+        // Until you reach the end of the rectangle horizontally
         while (vTrackPos <= temp.x2)
         {
             Y.push_back(vTrackIdx);
@@ -111,7 +121,8 @@ void abstractObs() // Abstract Obstructions
             vTrackPos += vMetal.step;
         }
 
-        Cell aux;
+        Cell aux; // Auxiliary cell that represents an abstract cell
+        // Pair the x and y coordinates together to form grid points
         for (int I = 0; I < X.size(); ++I)
         {
             for (int J = 0; J < Y.size(); ++J)
