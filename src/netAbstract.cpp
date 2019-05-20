@@ -9,7 +9,7 @@ using namespace std;
 vector<vector<vector<Cell>>> absNets;
 vector<Cell> absObs;
 vector<vector<vector<RECT>>> nets;
-vector<RECT> obs;
+//vector<RECT> obs;
 
 void abstractNets()
 {
