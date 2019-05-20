@@ -137,10 +137,10 @@ void readNets(ifstream &read, int num){
             }while(!(Buf.size() == 5 && Buf[4] == ";"));
 
 
-            if(routable){
+            vector<vector<RECT> > pins_temp;
+            vector<RECT> rects_temp;
 
-                vector<vector<RECT> > pins_temp;
-                vector<RECT> rects_temp;
+            if(routable){
 
                 for(int i = 0; i < pins.size(); i++){
                     rects_temp = macros[components[pins[i].first].macro].pins[pins[i].second].ports;
@@ -181,6 +181,10 @@ void readNets(ifstream &read, int num){
                     }
                     pins_temp.push_back(rects_temp);
                 }
+                nets.push_back(pins_temp);
+            }
+            else{
+                pins_temp.clear();
                 nets.push_back(pins_temp);
             }
 
@@ -648,15 +652,27 @@ bool readLEF(){
 	}
 	return 1;
 }
+/*
+int main(){
+    cout << readLEF() << endl;
+    cout << readDEF() << endl;
+
+    cout << "\n\nNets Section\n";
+    cout << "NUM OF NETS " << nets.size() << endl;
+    for(int i = 0; i < nets.size(); i++){
+        cout << "\tNET #" << i + 1 << " has NUM OF PINS " << nets[i].size() << endl;
+        for(int j = 0; j < nets[i].size(); j++){
+            cout << "\t\tThis pin has NUM OF PORTS " << nets[i][j].size() << endl;
+        }
+    }
+}
+
+/*
+int main(){
+    cout << readLEF() << endl;
+    cout << readDEF() << endl;
 
 
-//int main(){
-//    cout << readLEF() << endl;
-//    cout << readDEF() << endl;
-
-
-
-    /*
     cout << "LEF SECTION" << endl;
     cout << "CHARS    " << LEF_FILE.bus_left << "    " << LEF_FILE.bus_right << endl;
     cout << LEF_FILE.database << endl;
