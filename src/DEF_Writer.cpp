@@ -33,12 +33,12 @@ DEF_Writer::DEF_Writer(vector<metal> _metalStack, vector<vector<seg>> nets)
                 y2 = nets[i][j].c2 + minY + nonDefOffset[nextLayer];
                 same = 1;
             }
-            routed[i][j] = "";      // Make sure it's an empty string
+            routed[i][j] = ""; // Make sure it's an empty string
             // Use the non-default rule
             routed[i][j] += metalStack[mIdx].label + " TAPERRULE LayerScaleRule ";
             routed[i][j] += " ( " + to_string(x1) + " " + to_string(y1) + " ) ";
             // if both end are the same, then it's a via
-            if (x1 == x2 && y1 == y2)   
+            if (x1 == x2 && y1 == y2)
             {
                 routed[i][j] += "M" + to_string(mIdx + 2) + "_M" + to_string(mIdx + 1);
                 continue;
@@ -57,19 +57,19 @@ void DEF_Writer::wireSize()
     // First vertical layer set as constant reference (same as LEF)
     nonDefWidth.push_back(metalStack[1].width);
     nonDefOffset.push_back(metalStack[1].offset);
-    
+
     // Adjust width and offset for remaining layers
     for (int i = 2; i < metalStack.size(); i++)
     {
-        if (i % 2 == 0)     // Horizontal
+        if (i % 2 == 0) // Horizontal
         {
             nonDefWidth.push_back(metalStack[i].width);
             nonDefOffset.push_back(metalStack[i].offset);
         }
-        else        // Vertical
+        else // Vertical
         {
-            nonDefWidth.push_back(metalStack[i-2].pitch + metalStack[i-2].width);
-            nonDefOffset.push_back(metalStack[i-2].offset + metalStack[i-2].pitch/2);
+            nonDefWidth.push_back(metalStack[i - 2].pitch + metalStack[i - 2].width);
+            nonDefOffset.push_back(metalStack[i - 2].offset + metalStack[i - 2].pitch / 2);
         }
     }
 }
@@ -85,11 +85,25 @@ void DEF_Writer::write_DEF(string inFile)
     int k = 0;
     while (getline(in, token))
     {
+
+        if (token.find("END DESIGN") != string::npos)
+        {
+            // Write a non-default rule section to override width and offset in the LEF
+            out << "NONDEFAULTRULES 1 ;" << endl;
+            out << "- LayerScaleRule " << endl;
+            for (int i = 0; i < metalStack.size(); ++i)
+            {
+                out << "+ LAYER " + metalStack[i].label + " WIDTH " + to_string(nonDefWidth[i]);
+                out << " OFFSET " + to_string(nonDefOffset[i]);
+                if (i == metalStack.size() - 1)
+                    out << " ;";
+                out << endl;
+            }
+            out << "END NONDEFAULTRULES " << endl;
+        }
         out << token << endl;
-        // Remove leading spaces
-        while (token[0] == ' ')
-            token = token.substr(1);
-        if (token.substr(0, 4) == "NETS")
+
+        if (token.find("NETS") != string::npos)
         {
             k = 0;
             while (getline(in, token) && token.find("END NETS") == string::npos)
@@ -99,6 +113,8 @@ void DEF_Writer::write_DEF(string inFile)
                 {
                     out << token.substr(0, token.find(";")) << endl;
                     out << "+ ROUTED " << routed[k][0] << endl;
+                    if (routed[k].size() == 1)
+                        out << " ; \n";
                     for (int i = 1; i < routed[k].size(); ++i)
                     {
                         out << " NEW " + routed[k][i];
@@ -113,18 +129,7 @@ void DEF_Writer::write_DEF(string inFile)
                 else
                     out << token << endl;
             }
+            out << "END NETS \n";
         }
     }
-    // Write a non-default rule section to override width and offset in the LEF
-    out << "NONDEFAULTRULES 1 ;" << endl;
-    out << "- LayerScaleRule " << endl;
-    for (int i = 0; i < metalStack.size(); ++i)
-    {
-        out << "+ LAYER " + metalStack[i].label + " WIDTH " + to_string(nonDefWidth[i]);
-        out << " OFFSET " + to_string(nonDefOffset[i]);
-        if (i == metalStack.size() - 1)
-            out << " ;";
-        out << endl;
-    }
-    out << "END NONDEFAULTRULES " << endl;
 }
