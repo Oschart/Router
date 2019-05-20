@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "Cell.h"
-#include "DEF_Util.h"
+//#include "DEF_Util.h"
 #include "Parser.cpp"
 
 using namespace std;
@@ -37,22 +37,23 @@ void abstractNets()
                     vMetal = metalLayers[temp.metalLayer];
                 }
 
-                int hTrackIdx = (temp.x1 - hMetal.start - hMetal.step / 2) / hMetal.step;
+                int hTrackIdx = (temp.y1 - hMetal.start + hMetal.step / 2) / hMetal.step;
                 int hTrackPos = hMetal.start - hMetal.step / 2 + hTrackIdx * hMetal.step;
-                int vTrackIdx = (temp.y1 - vMetal.start - vMetal.step / 2) / vMetal.step;
+                int vTrackIdx = (temp.x1 - vMetal.start + vMetal.step / 2) / vMetal.step;
                 int vTrackPos = vMetal.start - vMetal.step / 2 + vTrackIdx * vMetal.step;
-                while (hTrackPos >= temp.x2)
+
+                while (hTrackPos <= temp.y2)
                 {
                     X.push_back(hTrackIdx);
                     hTrackIdx++;
-                    hTrackIdx += hMetal.step;
+                    hTrackPos += hMetal.step;
                 }
 
-                while (vTrackPos >= temp.y2)
+                while (vTrackPos <= temp.x2)
                 {
                     Y.push_back(vTrackIdx);
                     vTrackIdx++;
-                    vTrackIdx += vMetal.step;
+                    vTrackPos += vMetal.step;
                 }
 
                 Cell aux;
@@ -88,22 +89,23 @@ void abstractObs() // Abstract Obstructions
             vMetal = metalLayers[temp.metalLayer];
         }
 
-        int hTrackIdx = (temp.x1 - hMetal.start - hMetal.step / 2) / hMetal.step;
+        int hTrackIdx = (temp.y1 - hMetal.start + hMetal.step / 2) / hMetal.step;
         int hTrackPos = hMetal.start - hMetal.step / 2 + hTrackIdx * hMetal.step;
-        int vTrackIdx = (temp.y1 - vMetal.start - vMetal.step / 2) / vMetal.step;
+        int vTrackIdx = (temp.x1 - vMetal.start + vMetal.step / 2) / vMetal.step;
         int vTrackPos = vMetal.start - vMetal.step / 2 + vTrackIdx * vMetal.step;
-        while (hTrackPos >= temp.x2)
+
+        while (hTrackPos <= temp.y2)
         {
             X.push_back(hTrackIdx);
             hTrackIdx++;
-            hTrackIdx += hMetal.step;
+            hTrackPos += hMetal.step;
         }
 
-        while (vTrackPos >= temp.y2)
+        while (vTrackPos <= temp.x2)
         {
             Y.push_back(vTrackIdx);
             vTrackIdx++;
-            vTrackIdx += vMetal.step;
+            vTrackPos += vMetal.step;
         }
 
         Cell aux;
