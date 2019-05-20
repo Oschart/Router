@@ -29,27 +29,34 @@ For this application, the Soukup's Fast Maze Router is the base algorithm used f
 Global and Detailed Routing with some variations between the two in order to cater for 
 their differences in objectives and constraints. The most notable variation made onto 
 the one used for Global Routing is introducing the concept of GCell Cost Threshold, which
-is the number of nets using (inside) the GCell, after which the GCell starts being avoided
-and possibly blocked (considered an obstacle). This cost threshold is adjusted to be equal 
-to half the number of tracks within the GCell with each net being assigned a track within the 
-GCell. In doing so, we spare a resonable free room to be used in critical situations such as 
-when routing a target GCell that has already exceeded the cost threshold, in which case upper 
-metal layers are utilized to circumvent blockages and congestion. 
+is the number of nets using (inside) the GCell, as well as the number of cell obstructions,
+after which the GCell starts being avoided and possibly blocked (considered an obstacle). This cost threshold is left as a design decision for the user, same as the dimesnions of the global grid. In doing so, we spare a resonable free room to be used in critical situations such as when routing a target GCell that has already exceeded the cost threshold, in which case upper metal layers are utilized to circumvent blockages and congestion. 
 ***********************************************************************************************
+**Technical Details of Routing**
+----------------------
+The routing process is as follows: 
+1. Pin locations of the nets, read from the DEF file as rectangles, are translated into grid cells. 
+2. A global netlist is derived from the input netlist
+3. Details of the global grid are computed, and the grids are prepared for routing
+4. Obstructions are taken into consideration
+5. Each net is routed one by one
+    - The source is first routed to the nearest cell, globally then in details. 
+    - For all other pins other than the source and the first target: one of the cells designating this pin is set as source, and is routed, attempting for any cell on the previously created paths
+    - An optimal path is found by Soukup's algorithm for this pin. 
+6. Wire segments are deduced while tracing-back the maze-routing algorithm
+7. Wire segments are passed on to the DEF-writer, which interprets them into rectangular wires, and writes out a complete DEF file. 
+*********************************************************************************************
+**Issues and Limitations**
+--------------------------
+1. The static limit functionality on GCells is very weak. It does not differentiate between how obstructions and pins are arranged within the GCell. So, a GCell could be blocked although it could still have space, and it could be free although it cannot be used for routing. 
+2. Congestion cost of each GCell cannot be used to discourage router from using them. Soukup's router is a greedy router that aims to run for the target. It does not minimize over an arbitrary cost function other than the distance to the target. Hence, it was difficult to avoid congestions. This led to our design's inability to process large, heavily congested design. The router just fills whatever space closest to it, in effect choking the first metal layer from all others. 
+********************************************************************************************
+
 **How to use:**
 ----------------
-To use the global router:
-1. Compile and/or run the file (you can do it using the provided groute.exe file)
-2. You will be prompted to enter details about the global route grid and the netlist
-3. The global route cost matrix will be printed out, where each cell value corresponds to the number of nets assigned to this GCell
-
-To run this milestone's code:
-1. Insert your test case file in a file called "in.txt"
-2. Open cmd (e.g. PowerShell)
-3. Navigate to the project directory 
-4. Run the command "g++ -o Demo Demo.cpp" to compile
-5. Insert "./Demo" to run
-6. Routing output appears to the console, Routed DEF is written to the file specified in "in.txt" 
+1. Compile and/or run the router.cpp file
+    - You can use the command "g++ -o route router.cpp && ./route" from the directory of the source files
+2. As prompted, enter the dimensions for the global grid, the limit on each GCell, whether or not you want to consider obstructions, and the def/lef file names, in addition to the output def name. 
 ***********************************************************************************************
 ***Progress Report:***
 ---------------------
@@ -64,10 +71,7 @@ To run this milestone's code:
 	- Parsed design info from the DEF file     
 	- Parsing checking for some syntax errors   
     - Fully implemented DEF_Writer 
-* *What's left to do:*    
-    - Complete LEF parsing    
-    - DEF Writer Optimization  
-    - Full mechanism for ripping routes   
+
 ***********************************************************************************************
 **References:**
 ---------------
