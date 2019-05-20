@@ -20,7 +20,7 @@ public:
 	
 private:
     vector<metal> metalStack;       // Vector containing metal layers
-    vector<int> nonDefWidth;    // nonDefault Rules
+    vector<int> nonDefWidth, nonDefOffset;    // nonDefault Rules
     vector<seg> wireSeg;        // Wire segments
 	vector<vector<string> > routed;     // ROUTED statements
     void wireSize();        // Size the wires (decide the widths)
