@@ -3,16 +3,19 @@
 #include <vector>
 #include <fstream>
 #include <map>
+#include <cmath>
 #include "DEF_Util.h"
 
 using namespace std;
 
 map <string, int> metalTable;
 map <string, int> cutTable;
+map <string, macro> macros;
 
 vector <metal> metalLayers;
 vector <cut> cutLayers;
 vector <via> vias;
+vector <RECT> obs;
 
 string inDEF;
 
@@ -164,15 +167,113 @@ bool readDEF(){
 
 }
 
-void readMacro(ifstream &read, string name){
+void readOBS(ifstream &read){
+
     string buf;
     vector <string> Buf;
 
     getline(read, buf);
     Buf = Extract(buf);
-    while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == name)){
-
+    int layer = -1;
+    while(!(Buf.size() == 1 && Buf[0] == "END")){
+        if(Buf.size() == 3 && Buf[0] == "LAYER" && Buf[2] == ";"){
+            if(metalTable.find(Buf[1]) != metalTable.end()) layer = metalTable[Buf[1]];
+            else layer = -1;
+        }
+        else if(Buf.size() == 6 && Buf[0] == "RECT" && Buf[5] == ";" && layer > -1){
+            RECT newRECT;
+            newRECT.metalLayer = layer;
+            newRECT.x1 = round(stod(Buf[1]) * LEF_FILE.unit);
+            newRECT.y1 = round(stod(Buf[2]) * LEF_FILE.unit);
+            newRECT.x2 = round(stod(Buf[3]) * LEF_FILE.unit);
+            newRECT.y2 = round(stod(Buf[4]) * LEF_FILE.unit);
+            obs.push_back(newRECT);
+        }
+        getline(read, buf);
+        Buf = Extract(buf);
     }
+}
+
+void readPin(ifstream &read, string name, macro &newMacro){
+    string buf;
+    vector <string> Buf;
+
+    pin newPin;
+    newPin.label = name;
+    getline(read, buf);
+    Buf = Extract(buf);
+
+    while(!(Buf.size() == 1 && Buf[0] == "PORT")){
+        getline(read, buf);
+        Buf = Extract(buf);
+    }
+
+    int layer = -1;
+
+    getline(read, buf);
+    Buf = Extract(buf);
+    while(!(Buf.size() == 1 && Buf[0] == "END")){
+        if(Buf.size() == 3 && Buf[0] == "LAYER" && Buf[2] == ";"){
+            if(metalTable.find(Buf[1]) != metalTable.end()) layer = metalTable[Buf[1]];
+            else layer = -1;
+        }
+        else if(Buf.size() == 6 && Buf[0] == "RECT" && Buf[5] == ";" && layer > -1){
+            RECT newRECT;
+            newRECT.metalLayer = layer;
+            newRECT.x1 = round(stod(Buf[1]) * LEF_FILE.unit);
+            newRECT.y1 = round(stod(Buf[2]) * LEF_FILE.unit);
+            newRECT.x2 = round(stod(Buf[3]) * LEF_FILE.unit);
+            newRECT.y2 = round(stod(Buf[4]) * LEF_FILE.unit);
+            newPin.ports.push_back(newRECT);
+        }
+        getline(read, buf);
+        Buf = Extract(buf);
+    }
+
+    newMacro.pins[name] = newPin;
+}
+
+void readMacro(ifstream &read, string name){
+    string buf;
+    vector <string> Buf;
+    getline(read, buf);
+    Buf = Extract(buf);
+
+    macro newMacro;
+    newMacro.label = name;
+    if(Buf.size() == 3 && Buf[0] == "CLASS" && Buf[2] == ";"){
+        if(Buf[1] == "CORE"){
+            getline(read, buf);
+            Buf = Extract(buf);
+            while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == name)){
+
+                if(Buf.size() == 2 && Buf[0] == "PIN"){
+                    readPin(read, Buf[1], newMacro);
+                }
+                else if(Buf.size() == 1 && Buf[0] == "OBS"){
+                    readOBS(read);
+                }
+
+                getline(read, buf);
+                Buf = Extract(buf);
+            }
+        }
+        else{
+            getline(read, buf);
+            Buf = Extract(buf);
+            while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == name)){
+
+                if(Buf.size() == 1 && Buf[0] == "OBS"){
+                    readOBS(read);
+                }
+
+                getline(read, buf);
+                Buf = Extract(buf);
+            }
+        }
+    }
+
+    macros[name] = newMacro;
 }
 
 void readVia(ifstream &read, string name, bool Default){
@@ -184,7 +285,7 @@ void readVia(ifstream &read, string name, bool Default){
 
     via newVia;
     newVia.Default = Default;
-
+    newVia.label = name;
     getline(read, buf);
     Buf = Extract(buf);
     while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == name)){
@@ -249,10 +350,10 @@ void readLayer(ifstream &read, string name){
             while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == name)){
                 if(Buf.size() == 3 && Buf[2] == ";"){
                     if(Buf[0] == "DIRECTION") newMetal.dir = Buf[1][0];
-                    else if(Buf[0] == "PITCH") newMetal.pitch = stod(Buf[1]);
-                    else if(Buf[0] == "WIDTH") newMetal.width = stod(Buf[1]);
-                    else if(Buf[0] == "SPACING") newMetal.spacing = stod(Buf[1]);
-                    else if(Buf[0] == "OFFSET") newMetal.offset = stod(Buf[1]);
+                    else if(Buf[0] == "PITCH") newMetal.pitch = stod(Buf[1]) * LEF_FILE.unit;
+                    else if(Buf[0] == "WIDTH") newMetal.width = stod(Buf[1]) * LEF_FILE.unit;
+                    else if(Buf[0] == "SPACING") newMetal.spacing = stod(Buf[1]) * LEF_FILE.unit;
+                    else if(Buf[0] == "OFFSET") newMetal.offset = stod(Buf[1]) * LEF_FILE.unit;
                 }
                 getline(read, buf);
                 Buf = Extract(buf);
@@ -340,7 +441,7 @@ bool readLEF(){
                 while(buf != "END UNITS"){
                     Buf = Extract(buf);
                     if(Buf.size() == 4 && Buf[0] == "DATABASE" && Buf[1] == "MICRONS" && Buf[3] == ";"){
-                        LEF_FILE.database = stoi(Buf[2]);
+                        LEF_FILE.unit = stoi(Buf[2]);
                     }
                     getline(read, buf);
                 }
@@ -372,11 +473,10 @@ bool readLEF(){
 
             else if(Buf[index] == "MACRO"){
                 if(Buf.size() > index + 1){
-                    //readMacro(read, Buf[1]);
-
+                    readMacro(read, Buf[1]);
                 }
                 else{
-                    cout << "Undefined parameters list after \"VIA\"\n";
+                    cout << "Undefined parameters list after \"MACRO\"\n";
                     return 0;
                 }
                 index = Buf.size();
@@ -388,12 +488,6 @@ bool readLEF(){
 	}
 	return 1;
 }
-
-int masin(){
-
-
-}
-
 
 //int main(){
 //    cout << readLEF() << endl;
@@ -447,5 +541,24 @@ int masin(){
         for(int j = 0; j < vias[i].topLayerShape.size(); j++)cout << vias[i].topLayerShape[j].first << ", " << vias[i].topLayerShape[j].second << "     ";
         cout << endl;
     }
+
+    cout << "MICROS SECTION" << endl;
+    for(auto i = macros.begin(); i != macros.end(); i++){
+        cout << "MACRO " << i->first << endl;
+        macro ty = i->second;
+        for(auto j = ty.pins.begin(); j != ty.pins.end(); j++){
+            cout << "\tPIN " << j->first << endl;
+            vector<RECT> vec = j->second.ports;
+            for(int k = 0; k < vec.size(); k++){
+                cout << "\t\tIn layer " << vec[k].metalLayer << " RECT " << vec[k].x1 << " " << vec[k].y1 << " " << vec[k].x2 << " " << vec[k].y2 << endl;
+            }
+        }
+    }
+
+    cout << "OBSTRUCTIONS SECTION" << endl;
+    for(int i = 0; i < obs.size(); i++){
+        cout << "In layer " << obs[i].metalLayer << " RECT " << obs[i].x1 << " " << obs[i].y1 << " " << obs[i].x2 << " " << obs[i].y2 << endl;
+    }
     */
+
 //}

@@ -5,20 +5,19 @@
 using namespace std;
 
 
-struct RECT
-{
+struct RECT{
     int metalLayer;
     int x1, y1, x2, y2;
 };
 
-struct seg
-{
+struct seg{
     int metalLayer, trackIdx;
     double c1, c2;
 };
 
 struct via{
     bool Default;
+    string label;
     int botLayerIndex, cutLayerIndex, topLayerIndex;
     vector <pair<double, double> > botLayerShape, cutLayerShape, topLayerShape;
 };
@@ -41,19 +40,20 @@ struct metal{
 };
 
 struct pin{
-
+    string label;
+    vector<RECT> ports;
 };
 
 struct macro{
-    string name;
+    string label;
     pair<double, double> size;
-
+    map <string, pin> pins;
 };
 
 struct LEF{
     string ver;
     char div, bus_left, bus_right;
-    int database;
+    int unit;
 };
 
 struct DEF{
