@@ -11,6 +11,7 @@ using namespace std;
 map <string, int> metalTable;
 map <string, int> cutTable;
 map <string, macro> macros;
+map <string, component> components;
 
 vector <metal> metalLayers;
 vector <cut> cutLayers;
@@ -38,6 +39,82 @@ vector<string> Extract(string line){
     return tokens;
 }
 
+RECT fix(RECT rect){
+    RECT fixd;
+
+    fixd.metalLayer = rect.metalLayer;
+    fixd.x1 = min(rect.x1, rect.x2);
+    fixd.y1 = min(rect.y1, rect.y2);
+    fixd.x2 = max(rect.x1, rect.x2);
+    fixd.y2 = max(rect.y1, rect.y2);
+
+    return fixd;
+}
+
+
+void readComponents(ifstream &read, int num){
+
+
+    string buf;
+    vector <string> Buf;
+    int done = 0;
+
+    getline(read, buf);
+    Buf = Extract(buf);
+    while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == "COMPONENTS")){
+
+        if(Buf.size() == 11 && Buf[0] == "-" && Buf[3] == "+" && Buf[4] == "PLACED" && Buf[5] == "(" && Buf[8] == ")" && Buf[10] == ";"){
+            done++;
+
+            component newComponent;
+            newComponent.instance = Buf[1];
+            newComponent.macro = Buf[2];
+            newComponent.x_pos = stoi(Buf[6]);
+            newComponent.y_pos = stoi(Buf[7]);
+            newComponent.orientation = Buf[9];
+
+            components[Buf[1]] = newComponent;
+
+            //Adding the obstructions
+            macro placed = macros[Buf[2]];
+            for(int i = 0; i < placed.obs.size(); i++){
+                RECT obstruction;
+                obstruction.metalLayer = placed.obs[i].metalLayer;
+                if(Buf[9] == "N"){
+                    obstruction.x1 = placed.obs[i].x1 + newComponent.x_pos;
+                    obstruction.y1 = placed.obs[i].y1 + newComponent.y_pos;
+                    obstruction.x2 = placed.obs[i].x2 + newComponent.x_pos;
+                    obstruction.y2 = placed.obs[i].y2 + newComponent.y_pos;
+                }
+                else if(Buf[9] == "FN"){
+                    obstruction.x1 = (placed.width - placed.obs[i].x1) + newComponent.x_pos;
+                    obstruction.y1 = placed.obs[i].y1 + newComponent.y_pos;
+                    obstruction.x2 = (placed.width - placed.obs[i].x2) + newComponent.x_pos;
+                    obstruction.y2 = placed.obs[i].y2 + newComponent.y_pos;
+                }
+                else if(Buf[9] == "FS"){
+                    obstruction.x1 = placed.obs[i].x1 + newComponent.x_pos;
+                    obstruction.y1 = (placed.height - placed.obs[i].y1) + newComponent.y_pos;
+                    obstruction.x2 = placed.obs[i].x2 + newComponent.x_pos;
+                    obstruction.y2 = (placed.height - placed.obs[i].y2) + newComponent.y_pos;
+                }
+                else if(Buf[9] == "S"){
+                    obstruction.x1 = (placed.width - placed.obs[i].x1) + newComponent.x_pos;
+                    obstruction.y1 = (placed.height - placed.obs[i].y1) + newComponent.y_pos;
+                    obstruction.x2 = (placed.width - placed.obs[i].x2) + newComponent.x_pos;
+                    obstruction.y2 = (placed.height - placed.obs[i].y2) + newComponent.y_pos;
+                }
+                obs.push_back(fix(obstruction));
+            }
+        }
+        getline(read, buf);
+        Buf = Extract(buf);
+    }
+
+    if(done != num){
+        cout << "Warning: The components list is not equal to " << num << " as stated at the beginning of the components section\n";
+    }
+}
 
 bool readDEF(){
 	string source, buf;
@@ -159,6 +236,11 @@ bool readDEF(){
                     return 0;
                 }
 			}
+			else if(Buf.size() > index + 2 && Buf[index] == "COMPONENTS" && Buf[index + 2] == ";"){
+                readComponents(read, stod(Buf[1]));
+
+                index = Buf.size();
+			}
 			else index = Buf.size();
 		}
     getline(read, buf);
@@ -167,7 +249,7 @@ bool readDEF(){
 
 }
 
-void readOBS(ifstream &read){
+void readObs(ifstream &read, macro &newMacro){
 
     string buf;
     vector <string> Buf;
@@ -175,6 +257,7 @@ void readOBS(ifstream &read){
     getline(read, buf);
     Buf = Extract(buf);
     int layer = -1;
+
     while(!(Buf.size() == 1 && Buf[0] == "END")){
         if(Buf.size() == 3 && Buf[0] == "LAYER" && Buf[2] == ";"){
             if(metalTable.find(Buf[1]) != metalTable.end()) layer = metalTable[Buf[1]];
@@ -183,11 +266,11 @@ void readOBS(ifstream &read){
         else if(Buf.size() == 6 && Buf[0] == "RECT" && Buf[5] == ";" && layer > -1){
             RECT newRECT;
             newRECT.metalLayer = layer;
-            newRECT.x1 = round(stod(Buf[1]) * LEF_FILE.unit);
-            newRECT.y1 = round(stod(Buf[2]) * LEF_FILE.unit);
-            newRECT.x2 = round(stod(Buf[3]) * LEF_FILE.unit);
-            newRECT.y2 = round(stod(Buf[4]) * LEF_FILE.unit);
-            obs.push_back(newRECT);
+            newRECT.x1 = round(stod(Buf[1]) * 100);
+            newRECT.y1 = round(stod(Buf[2]) * 100);
+            newRECT.x2 = round(stod(Buf[3]) * 100);
+            newRECT.y2 = round(stod(Buf[4]) * 100);
+            newMacro.obs.push_back(newRECT);
         }
         getline(read, buf);
         Buf = Extract(buf);
@@ -242,34 +325,30 @@ void readMacro(ifstream &read, string name){
     macro newMacro;
     newMacro.label = name;
     if(Buf.size() == 3 && Buf[0] == "CLASS" && Buf[2] == ";"){
-        if(Buf[1] == "CORE"){
+
+        getline(read, buf);
+        Buf = Extract(buf);
+
+        while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == name)){
+
+            if(Buf.size() == 3 && Buf[0] == "CLASS" && Buf[2] == ";"){
+                newMacro.Class = Buf[1];
+            }
+
+            else if(Buf.size() == 5 && Buf[0] == "SIZE" && Buf[2] == "BY" && Buf[4] == ";"){
+                newMacro.width = round(stod(Buf[1]) * 100);
+                newMacro.height = round(stod(Buf[3]) * 100);
+            }
+
+            else if(Buf.size() == 2 && Buf[0] == "PIN"){
+                readPin(read, Buf[1], newMacro);
+            }
+            else if(Buf.size() == 1 && Buf[0] == "OBS"){
+                readObs(read, newMacro);
+            }
+
             getline(read, buf);
             Buf = Extract(buf);
-            while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == name)){
-
-                if(Buf.size() == 2 && Buf[0] == "PIN"){
-                    readPin(read, Buf[1], newMacro);
-                }
-                else if(Buf.size() == 1 && Buf[0] == "OBS"){
-                    readOBS(read);
-                }
-
-                getline(read, buf);
-                Buf = Extract(buf);
-            }
-        }
-        else{
-            getline(read, buf);
-            Buf = Extract(buf);
-            while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == name)){
-
-                if(Buf.size() == 1 && Buf[0] == "OBS"){
-                    readOBS(read);
-                }
-
-                getline(read, buf);
-                Buf = Extract(buf);
-            }
         }
     }
 
@@ -350,10 +429,10 @@ void readLayer(ifstream &read, string name){
             while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == name)){
                 if(Buf.size() == 3 && Buf[2] == ";"){
                     if(Buf[0] == "DIRECTION") newMetal.dir = Buf[1][0];
-                    else if(Buf[0] == "PITCH") newMetal.pitch = stod(Buf[1]) * LEF_FILE.unit;
-                    else if(Buf[0] == "WIDTH") newMetal.width = stod(Buf[1]) * LEF_FILE.unit;
-                    else if(Buf[0] == "SPACING") newMetal.spacing = stod(Buf[1]) * LEF_FILE.unit;
-                    else if(Buf[0] == "OFFSET") newMetal.offset = stod(Buf[1]) * LEF_FILE.unit;
+                    else if(Buf[0] == "PITCH") round(newMetal.pitch = stod(Buf[1]) * 100);
+                    else if(Buf[0] == "WIDTH") round(newMetal.width = stod(Buf[1]) * 100);
+                    else if(Buf[0] == "SPACING") round(newMetal.spacing = stod(Buf[1]) * 100);
+                    else if(Buf[0] == "OFFSET") round(newMetal.offset = stod(Buf[1]) * 100);
                 }
                 getline(read, buf);
                 Buf = Extract(buf);
@@ -489,6 +568,7 @@ bool readLEF(){
 	return 1;
 }
 
+
 //int main(){
 //    cout << readLEF() << endl;
 //    cout << readDEF() << endl;
@@ -553,11 +633,16 @@ bool readLEF(){
                 cout << "\t\tIn layer " << vec[k].metalLayer << " RECT " << vec[k].x1 << " " << vec[k].y1 << " " << vec[k].x2 << " " << vec[k].y2 << endl;
             }
         }
+        cout << "\tObstruction" << endl;
+        for(int k = 0; k < ty.obs.size(); k++){
+            cout << "\t\tIn layer " << vec[k].metalLayer << " RECT " << vec[k].x1 << " " << vec[k].y1 << " " << vec[k].x2 << " " << vec[k].y2 << endl;
+        }
+
     }
 
-    cout << "OBSTRUCTIONS SECTION" << endl;
+    cout << "\nObstructions Section\n";
     for(int i = 0; i < obs.size(); i++){
-        cout << "In layer " << obs[i].metalLayer << " RECT " << obs[i].x1 << " " << obs[i].y1 << " " << obs[i].x2 << " " << obs[i].y2 << endl;
+        cout << "In layer " << obs[i].metalLayer << " Rectangle " << obs[i].x1 << " " << obs[i].y1 << " " << obs[i].x2 << " " << obs[i].y2 << endl;
     }
     */
 

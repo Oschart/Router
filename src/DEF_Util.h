@@ -28,13 +28,18 @@ struct cut{
     double spacing;
 };
 
+struct component{
+    string instance, macro, orientation;
+    int x_pos, y_pos;
+};
+
 struct metal{
     string label;
     int index;
     char dir;
-    double pitch, width, spacing, offset;
+    int pitch, width, spacing, offset;
     //
-    double start, step;
+    int start, step;
     int numTracks;
 
 };
@@ -45,9 +50,10 @@ struct pin{
 };
 
 struct macro{
-    string label;
-    pair<double, double> size;
+    string label, Class;
+    int width, height;
     map <string, pin> pins;
+    vector<RECT> obs;
 };
 
 struct LEF{
