@@ -85,8 +85,8 @@ void DEF_Writer::write_DEF(string inFile)
     int k = 0;
     while (getline(in, token))
     {
-        
-        if (token.find("END DESIGN") != string::npos)
+        out << token << endl;
+        if (token.find("END COMPONENTS") != string::npos)
         {
             // Write a non-default rule section to override width and offset in the LEF
             out << "NONDEFAULTRULES 1 ;" << endl;
@@ -100,10 +100,8 @@ void DEF_Writer::write_DEF(string inFile)
                 out << endl;
             }
             out << "END NONDEFAULTRULES " << endl;
-            out << "END DESIGN \n";
-            break;
         }
-        out << token << endl;
+        
         // Remove leading spaces
         while (token[0] == ' ')
             token = token.substr(1);
