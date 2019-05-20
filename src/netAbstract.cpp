@@ -67,7 +67,6 @@ void abstractNets()
                         absNets[i][j].push_back(aux);
                     }
                 }
-                cout << "Size = " << absNets[i][j].size() << endl;
                 if(absNets[i][j].size() == 0) cout << "Error at " << i << ", " << j << endl;
             }
         }
