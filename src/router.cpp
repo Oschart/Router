@@ -328,6 +328,7 @@ vector<vector<seg>> getSegments() {
     //processing wire segments
     for (int i = 0 ; i < segments.size(); i++){
         for (int j = 0; j < segments[i].size(); j++){
+            cout << segments[i][j].metalLayer << " " << segments[i][j].trackIdx << " " << segments[i][j].c1 << " " << segments[i][j].c2 << endl;
             segments[i][j].trackIdx *= metalLayers[segments[i][j].metalLayer].pitch;
             segments[i][j].c1 *= metalLayers[segments[i][j].metalLayer + (segments[i][j].metalLayer == n_layers-1? -1 : 1)].pitch;
             segments[i][j].c2 *= metalLayers[segments[i][j].metalLayer + (segments[i][j].metalLayer == n_layers-1? -1 : 1)].pitch;

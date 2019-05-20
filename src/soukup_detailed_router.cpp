@@ -187,6 +187,8 @@ vector<Cell> dtraceback() {
         if (neighbor_traceback >= 3){
             if ((neighbor.getk()+mdirect)%2 == 0)c2 = neighbor.getj();
             else c2 = neighbor.geti();
+        }
+        if (neighbor_traceback == 4){
             if (!tar){
                 seg myseg;
                 myseg.c1 = c1-1;
@@ -196,7 +198,7 @@ vector<Cell> dtraceback() {
                 current.push_back(myseg);
             }
 
-            if (neighbor_traceback==3) --layer;
+
             c1 = c2;
             seg myseg;
             myseg.c1 = c1-1;
@@ -204,8 +206,8 @@ vector<Cell> dtraceback() {
             myseg.metalLayer = layer;
             myseg.trackIdx = idx;
             current.push_back(myseg);
+            layer++;
         }
-        tar = 0;
         father = neighbor;
         int flag = -1;
         //getting the next neighbor using the traceback grid
@@ -236,12 +238,31 @@ vector<Cell> dtraceback() {
             if (flag) neighbor = dgrid.grid[levelk][leveli][levelj-1];
             else neighbor = dgrid.grid[levelk][leveli-1][levelj];
         }
-
-        if (neighbor_traceback >= 3){
-            layer = neighbor.getk();
+        if (neighbor_traceback == 4){
             if ((neighbor.getk()+mdirect)%2 == 0){idx = neighbor.geti()-1; c1 = neighbor.getj();}
             else {idx = neighbor.getj()-1 ; c1 = neighbor.geti();}
         }
+        if (neighbor_traceback == 3){ //if going down
+            if (!tar){
+                seg myseg;
+                myseg.c1 = c1-1;
+                myseg.c2 = c2-1;
+                myseg.metalLayer = layer;
+                myseg.trackIdx = idx;
+                current.push_back(myseg);
+            }
+            layer = neighbor.getk();
+            if ((neighbor.getk()+mdirect)%2 == 0){idx = neighbor.geti()-1; c1 = neighbor.getj();}
+            else {idx = neighbor.getj()-1 ; c1 = neighbor.geti();}
+            c2 = c1;
+            seg myseg;
+            myseg.c1 = c1-1;
+            myseg.c2 = c2-1;
+            myseg.metalLayer = layer;
+            myseg.trackIdx = idx;
+            current.push_back(myseg);
+        }
+        tar = 0;
         int n_traceback = neighbor.getS();
         neighbor.setS(7);
         path.push_back(neighbor);

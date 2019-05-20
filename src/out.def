@@ -1,0 +1,181 @@
+VERSION 5.6 ;
+NAMESCASESENSITIVE ON ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "<>" ;
+DESIGN counter_2bit ;
+UNITS DISTANCE MICRONS 100 ;
+
+DIEAREA ( -480.0 0.0 ) ( 7360.0 2400.0 ) ;
+
+TRACKS Y 0.0 DO 13 STEP 200 LAYER metal1 ;
+TRACKS X -480.0 DO 50 STEP 160.0 LAYER metal2 ;
+TRACKS Y 0.0 DO 13 STEP 200 LAYER metal3 ;
+TRACKS X -480.0 DO 25 STEP 320.0 LAYER metal4 ;
+
+COMPONENTS 8 ;
+- BUFX2_2 BUFX2 + PLACED ( 80.0 100 ) S ;
+- DFFPOSX1_2 DFFPOSX1 + PLACED ( 560.0 100 ) S ;
+- AOI21X1_1 AOI21X1 + PLACED ( 2480.0 100 ) S ;
+- OAI21X1_1 OAI21X1 + PLACED ( 3120.0 100 ) FS ;
+- INVX1_1 INVX1 + PLACED ( 3760.0 100 ) S ;
+- NOR2X1_1 NOR2X1 + PLACED ( 4080.0 100 ) FS ;
+- DFFPOSX1_1 DFFPOSX1 + PLACED ( 4560.0 100 ) FS ;
+- BUFX2_1 BUFX2 + PLACED ( 6480.0 100 ) FS ;
+END COMPONENTS
+
+PINS 4 ;
+- clk + NET clk
+  + LAYER metal2 ( 0 0 ) ( 1 1 )
+  + PLACED ( 2080.0 2400.0 ) N ;
+- reset + NET reset
+  + LAYER metal2 ( 0 0 ) ( 1 1 )
+  + PLACED ( 4160.0 2400.0 ) N ;
+- dout<0> + NET dout<0>
+  + LAYER metal3 ( 0 0 ) ( 1 1 )
+  + PLACED ( 7200.0 1200.0 ) N ;
+- dout<1> + NET dout<1>
+  + LAYER metal3 ( 0 0 ) ( 1 1 )
+  + PLACED ( -160.0 1200.0 ) N ;
+END PINS
+
+NETS 10 ;
+- $auto$iopadmap.cc:164:execute$47<0>
+  ( DFFPOSX1_1 Q ) 
+  ( NOR2X1_1 B ) 
+  ( AOI21X1_1 A ) 
+  ( OAI21X1_1 A ) 
+  ( BUFX2_1 A ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 2640 1300 )  ( 2320 * ) 
+- dout<0>
+  ( PIN dout<0> ) 
+  ( BUFX2_1 Y ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 3920 900 )  ( 3760 * ) 
+- $auto$iopadmap.cc:164:execute$47<1>
+  ( DFFPOSX1_2 Q ) 
+  ( AOI21X1_1 B ) 
+  ( OAI21X1_1 B ) 
+  ( BUFX2_2 A ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 4400 1900 )  ( 4720 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 4720 1900 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 4720 1900 )  ( * 1300 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 560 6500 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 4720 1300 )  ( 4880 * )  ;
+- dout<1>
+  ( PIN dout<1> ) 
+  ( BUFX2_2 Y ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 560 1300 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 560 1300 )  ( * 1100 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 400 1300 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 560 1100 )  ( 720 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 720 1100 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 720 1100 )  ( * 900 ) 
+ NEW metal2 TAPERRULE LayerScaleRule  ( 720 900 ) M3_M2
+ NEW metal3 TAPERRULE LayerScaleRule  ( 640 900 )  ( 2880 * ) 
+ NEW metal2 TAPERRULE LayerScaleRule  ( 240 2100 ) M3_M2
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2960 900 )  ( * 1300 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 560 4300 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 400 4300 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2960 1100 )  ( 3280 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 3280 1100 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 3280 1100 )  ( * 1300 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 560 4700 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 3280 1300 )  ( 3440 * )  ;
+- reset
+  ( PIN reset ) 
+  ( NOR2X1_1 A ) 
+  ( INVX1_1 A ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 3440 300 )  ( 2800 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 300 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2800 300 )  ( * 100 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( -400 4100 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 100 )  ( 2320 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 100 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2320 100 )  ( * 1700 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 880 3500 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 1700 )  ( 2640 * )  ;
+- _1_
+  ( OAI21X1_1 C ) 
+  ( INVX1_1 Y ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 3440 300 )  ( 2800 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 300 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2800 300 )  ( * 100 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( -400 4100 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 100 )  ( 2320 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 100 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2320 100 )  ( * 1700 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 880 3500 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 1700 )  ( 2640 * )  ;
+- _2_
+  ( AOI21X1_1 C ) 
+  ( OAI21X1_1 Y ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 3440 300 )  ( 2800 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 300 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2800 300 )  ( * 100 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( -400 4100 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 100 )  ( 2320 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 100 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2320 100 )  ( * 1700 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 880 3500 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 1700 )  ( 2640 * )  ;
+- _0_<1>
+  ( DFFPOSX1_2 D ) 
+  ( AOI21X1_1 Y ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 3440 300 )  ( 2800 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 300 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2800 300 )  ( * 100 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( -400 4100 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 100 )  ( 2320 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 100 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2320 100 )  ( * 1700 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 880 3500 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 1700 )  ( 2640 * )  ;
+- _0_<0>
+  ( DFFPOSX1_1 D ) 
+  ( NOR2X1_1 Y ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 3440 300 )  ( 2800 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 300 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2800 300 )  ( * 100 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( -400 4100 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 100 )  ( 2320 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 100 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2320 100 )  ( * 1700 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 880 3500 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 1700 )  ( 2640 * )  ;
+- clk
+  ( PIN clk ) 
+  ( DFFPOSX1_2 CLK ) 
+  ( DFFPOSX1_1 CLK ) 
++ ROUTED metal1 TAPERRULE LayerScaleRule  ( 3440 300 )  ( 2800 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 300 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2800 300 )  ( * 100 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( -400 4100 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2800 100 )  ( 2320 * ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 100 ) M2_M1
+ NEW metal2 TAPERRULE LayerScaleRule  ( 2320 100 )  ( * 1700 ) 
+ NEW metal1 TAPERRULE LayerScaleRule  ( 880 3500 ) M2_M1
+ NEW metal1 TAPERRULE LayerScaleRule  ( 2320 1700 )  ( 2640 * )  ;
+
+SPECIALNETS 5 ;
+- $auto$iopadmap.cc:164:execute$47<0>
++ ROUTED metal1 80 ( 6400 1140 ) ( * 1230 ) 
+  NEW metal1 80 ( 6080 1370 ) ( * 1540 ) ;
+- $auto$iopadmap.cc:164:execute$47<1>
++ ROUTED metal1 80 ( 640 1140 ) ( * 1230 ) 
+  NEW metal1 80 ( 960 1370 ) ( * 1540 ) ;
+- clk
+;
+- _1_
+;
+- _2_
++ ROUTED metal4 120 ( 3360 1200 ) ( * 1000 ) 
+  NEW metal1 80 ( 3330 1000 ) ( 3480 * ) ;
+END SPECIALNETS
+
+END DESIGN
+NONDEFAULTRULES 1 ;
+- LayerScaleRule 
++ LAYER metal1 WIDTH 59 OFFSET 100
++ LAYER metal2 WIDTH 59 OFFSET 80
++ LAYER metal3 WIDTH 59 OFFSET 100
++ LAYER metal4 WIDTH 219 OFFSET 160 ;
+END NONDEFAULTRULES 
