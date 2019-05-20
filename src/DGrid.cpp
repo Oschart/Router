@@ -14,8 +14,8 @@ DGrid::DGrid(int height_, int width_, int layers_, vector<int> tracks_, vector<i
 
     for (int i = 0 ; i < layers ; i++){
         int dheight, dwidth;
-        dwidth = tracks_per_gcell[i];
-        dheight = tracks_per_gcell[i + (i == layers-1 ? -1 : 1)];
+        dwidth = tracks_per_gcell_[i];
+        dheight = tracks_per_gcell_[i + (i == layers-1 ? -1 : 1)];
         if ((i+mdirect)%2 == 0) { swap(dwidth, dheight);}
         heights[i] = dheight;
         widths[i] = dwidth;
@@ -46,6 +46,7 @@ void DGrid::clean(){
     for (int k = 0 ; k < layers ; k++)
     for (int i = 0 ; i < grid[k].size() ; i++)
     for (int j = 0 ; j < grid[k][i].size() ; j++){
+        if (grid[k][i][j].getS() == 5) grid[k][i][j].setS(7);
         if (grid[k][i][j].getS() < 7) grid[k][i][j].setS(0);
         grid[k][i][j].setC(0);
     }

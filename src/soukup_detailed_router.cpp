@@ -8,19 +8,33 @@
 using namespace std;
 
 
-DGrid dgrid;
 int sdi, sdj, sdk, tdi, tdj, tdk; //source and target coordinates
 int mdirect;
 vector<Cell> dtargetCells; //the list of all possible current target
-
-//struct seg {
-//    int metalLayer, trackPos;
-//    int c1, c2;
-//
-//};
-
 vector<vector<seg>> segments;
 vector<seg> current;
+
+int getNormalizedDistance(int i1, int j1, int k1, int i2, int j2, int k2){
+    i1 *= (dgrid.heights[0]/dgrid.heights[k1]);
+    i2 *= (dgrid.heights[0]/dgrid.heights[k2]);
+    j1 *= (dgrid.widths[0]/dgrid.widths[k1]);
+    j2 *= (dgrid.widths[0]/dgrid.widths[k2]);
+    return abs(i1 - i2) + abs (j1 - j2) + abs (k1 - k2);
+}
+
+//gets the closest cell from a list of targets to a particular source cell
+int dgetClosest(Cell source, vector<Cell>& targets, int indx){
+    int mindist = INT_MAX; int ind;
+    for (int j = 0 ; j < targets.size(); j++){
+        if (j == indx) continue;
+        int dist =  getNormalizedDistance(source.geti(), source.getj(), source.getk(), targets[j].geti(), targets[j].getj(), targets[j].getk());
+        if (dist < mindist){
+                mindist = dist;
+                ind = j;
+        }
+    }
+    return ind;
+}
 
 
 //sets a cell as the target
@@ -33,9 +47,9 @@ void dmake_target(Cell cell){
 int getGCellS(Cell cell){
     int dheight = dgrid.heights[cell.getk()];
     int dwidth = dgrid.widths[cell.getk()];
-    int gi = cell.geti() / dheight + 1;
-    int gj = cell.getj() / dwidth + 1;
-    return grid.grid[cell.getk()][gi][gj].getS();
+    int gi = (cell.geti()-1) / dheight + 1;
+    int gj = (cell.getj()-1) / dwidth + 1;
+    return grid.grid[cell.getk()][gi][gj].allowed;
 
 }
 
@@ -43,6 +57,9 @@ int getGCellS(Cell cell){
 void dupdate_grid(Cell cell){
     dgrid.grid[cell.getk()][cell.geti()][cell.getj()].setS(cell.getS());
     dgrid.grid[cell.getk()][cell.geti()][cell.getj()].setC(cell.getC());
+    dgrid.grid[cell.getk()][cell.geti()][cell.getj()].target = cell.target;
+    dgrid.grid[cell.getk()][cell.geti()][cell.getj()].invobs = cell.invobs;
+
 }
 
 //step3 in the Soukup paper
@@ -76,16 +93,17 @@ void dstep3 (stack<Cell>& RN, stack<Cell>& RO, int& goto4, int& goto5, int& goto
                     leveli = ((cell.getk() == 0 || cell.getk() == grid.getLayers()-1? 1 : tracks[cell.getk()-1]/tracks[cell.getk()+1]))*leveli;
                 }
             }
-
             neighbor = dgrid.grid[levelk][leveli][levelj];
+
             int GS = getGCellS(neighbor);
 
             //evaluating the neighbor
             int C = neighbor.getC(), S = neighbor.getS();
-            if (C == 2 || S == 7 || GS != 10) continue;
-            if (S == 6) { neighbor_traceback = 2 + 4*(i >= 2) - i; goto8 = 1; return;}
+            if(neighbor.target){ neighbor_traceback = 2 + 4*(i >= 2) - i; goto8 = 1; return;}
+            if (C == 2 || S == 7&&!neighbor.invobs || !GS) continue;
+            if (S == 6 ) { neighbor_traceback = 2 + 4*(i >= 2) - i; goto8 = 1; return;}
             if (C <= 0){ //DFS / Line Search phase
-                if (abs(tdi - leveli) + abs(tdj - levelj) + abs(tdk - levelk) < abs(tdi - cell.geti()) + abs(tdj - cell.getj())+abs(tdk - cell.getk())){
+                if (getNormalizedDistance(tdi, tdj, tdk, leveli, levelj, levelk) < getNormalizedDistance(tdi, tdj, tdk, cell.geti(), cell.getj(), cell.getk())){
                     goto5 = 1;
                     neighbor_traceback = 2 + 4*(i >= 2) - i;
                     return;
@@ -93,7 +111,7 @@ void dstep3 (stack<Cell>& RN, stack<Cell>& RO, int& goto4, int& goto5, int& goto
             }
             if (C == 0){ //BFS/Lee expansion phase
                 neighbor.setC(1);
-                if (S <= 4){
+                if (S <= 4 || neighbor.invobs){
                     neighbor.setS(2 + 4*(i >= 2) - i);
                 }
                 dupdate_grid(neighbor);
@@ -111,12 +129,12 @@ void dsteps67(stack<Cell>& RO, int& goto3, int& goto6, int& goto8){
     int dir = 3 + 4*(neighbor_traceback>=3) - neighbor_traceback;
     while (1){
         neighbor.setC(2);
-        if (neighbor.getS() <= 4){
+        if (neighbor.getS() <= 4 || neighbor.invobs){
             neighbor.setS(neighbor_traceback);
         }
         dupdate_grid(neighbor);
         RO.push(neighbor);
-
+        if (dir == 3 && neighbor.getk() == 0 || dir == 4 && neighbor.getk() == grid.getLayers()-1){goto3 = 1; break;}
         if (dir < 3) neighbor = dgrid.grid[neighbor.getk()][neighbor.geti()+(metal_directions[neighbor.getk()])*dj[dir-1]][neighbor.getj()+((metal_directions[neighbor.getk()]==0)%2)*dj[dir-1]];
         else {
             if (dir == 4){ //went up
@@ -135,16 +153,16 @@ void dsteps67(stack<Cell>& RO, int& goto3, int& goto6, int& goto8){
                     neighbor.seti(((neighbor.getk() == 0 || neighbor.getk() == grid.getLayers()-1? 1 : tracks[neighbor.getk()-1]/tracks[neighbor.getk()+1]))*neighbor.geti());
                 }
             }
-            neighbor.setk(neighbor.getk() + (dir == 3? 1 : -1));
+            neighbor.setk(neighbor.getk() + (dir == 3? -1 : 1));
             neighbor = dgrid.grid[neighbor.getk()][neighbor.geti()][neighbor.getj()];
         }
         int C = neighbor.getC();
         int S = neighbor.getS();
         int GS = getGCellS(neighbor);
 
-        if (C == 2 || S == 7 || GS != 10) {goto3 = 1; break;}
-        if (S == 6) {goto8 = 1; break;}
-        if(abs(tdi - neighbor.geti()) + abs(tdj - neighbor.getj()) > abs(tdi - RO.top().geti()) + abs(tdj - RO.top().getj())){
+        if (C == 2 || S == 7&& !neighbor.invobs || GS == 0) {goto3 = 1; break;}
+        if (S == 6 || neighbor.target) {goto8 = 1; break;}
+        if(getNormalizedDistance(tdi, tdj, tdk, neighbor.geti(), neighbor.getj(), neighbor.getk()) > getNormalizedDistance(tdi, tdj, tdk, RO.top().geti(), RO.top().getj(), RO.top().getk())){
             goto3 = 1;
             break;
         }
@@ -176,10 +194,6 @@ vector<Cell> dtraceback() {
                 myseg.metalLayer = layer;
                 myseg.trackIdx = idx;
                 current.push_back(myseg);
-//                cout << "c1 = " << c1 << endl;
-//                cout << "c2 = " << c2 << endl;
-//                cout << "layer = " << layer << endl;
-//                cout << "idx = " << idx << endl;
             }
 
             if (neighbor_traceback==3) --layer;
@@ -190,14 +204,10 @@ vector<Cell> dtraceback() {
             myseg.metalLayer = layer;
             myseg.trackIdx = idx;
             current.push_back(myseg);
-//            cout << "c1 = " << c1 << endl;
-//            cout << "c2 = " << c2 << endl;
-//            cout << "layer = " << layer << endl;
-//            cout << "idx = " << idx << endl;
-
         }
         tar = 0;
         father = neighbor;
+        int flag = -1;
         //getting the next neighbor using the traceback grid
         int i = neighbor_traceback - 1;
         int levelk = neighbor.getk() + (i < 2 ? 0 : i == 2? -1 : 1);
@@ -214,12 +224,19 @@ vector<Cell> dtraceback() {
         else if (levelk < neighbor.getk()){ //went down
             if ((neighbor.getk()+mdirect)%2 == 0){ //went down from horizontal
                 levelj = ((neighbor.getk() == 0 || neighbor.getk() == grid.getLayers()-1? 1 : tracks[neighbor.getk()-1]/tracks[neighbor.getk()+1]))*levelj;
+                flag = 1;
             }
             else { //went down from vertical
                 leveli = ((neighbor.getk() == 0 || neighbor.getk() == grid.getLayers()-1? 1 : tracks[neighbor.getk()-1]/tracks[neighbor.getk()+1]))*leveli;
+                flag = 0;
             }
         }
         neighbor = dgrid.grid[levelk][leveli][levelj];
+        if (neighbor.getS() > 6 && !neighbor.invobs || neighbor.getS() < 1){
+            if (flag) neighbor = dgrid.grid[levelk][leveli][levelj-1];
+            else neighbor = dgrid.grid[levelk][leveli-1][levelj];
+        }
+
         if (neighbor_traceback >= 3){
             layer = neighbor.getk();
             if ((neighbor.getk()+mdirect)%2 == 0){idx = neighbor.geti()-1; c1 = neighbor.getj();}
@@ -229,26 +246,22 @@ vector<Cell> dtraceback() {
         neighbor.setS(7);
         path.push_back(neighbor);
         dupdate_grid(neighbor);
-        if (n_traceback == 5){
+        if (n_traceback == 5 || neighbor.invobs){
             if (neighbor_traceback < 3){
-            if ((neighbor.getk()+mdirect)%2 == 0)c2 = neighbor.getj();
-            else c2 = neighbor.geti();
-            seg myseg;
-            myseg.c1 = c1-1;
-            myseg.c2 = c2-1;
-            myseg.metalLayer = layer;
-            myseg.trackIdx = idx;
-            current.push_back(myseg);
-//            cout << "c1 = " << c1 << endl;
-//            cout << "c2 = " << c2 << endl;
-//            cout << "layer = " << layer << endl;
-//            cout << "idx = " << idx << endl;
-    }
+                if ((neighbor.getk()+mdirect)%2 == 0)c2 = neighbor.getj();
+                else c2 = neighbor.geti();
+                seg myseg;
+                myseg.c1 = c1-1;
+                myseg.c2 = c2-1;
+                myseg.metalLayer = layer;
+                myseg.trackIdx = idx;
+                current.push_back(myseg);
+            }
         }
         neighbor_traceback = n_traceback;
 
         //found the source
-        if (neighbor_traceback == 5) break;
+        if (neighbor_traceback == 5 || neighbor.invobs) break;
     }
 
     return path;
@@ -262,17 +275,17 @@ vector<Cell> dsoukup_route(Cell source){
     //marking source and target cells
     source.setS(5);
     source.setC(2);
-    Cell target = dtargetCells[getClosest(source, dtargetCells, -1)];
+    Cell target = dtargetCells[dgetClosest(source, dtargetCells, -1)];
     sdi = source.geti();
     sdj = source.getj();
     sdk = source.getk();
     dmake_target(target);
     target.setC(0);
-    target.setS(6);
+    //target.setS(6);
+    target.target = 1;
     dupdate_grid(source);
     dupdate_grid(target);
     RN.push(source);
-
 
     //each goto flag marks the next step to execute
     int goto2 = 1, goto3 = 0, goto4 = 0,  goto5 = 0, goto6 = 0, goto8 = 0;

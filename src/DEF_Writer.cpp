@@ -1,4 +1,3 @@
-#include "Parser.cpp"
 #include <iostream>
 
 using namespace std;
@@ -39,7 +38,7 @@ DEF_Writer::DEF_Writer(vector<metal> _metalStack, vector<vector<seg>> nets)
             routed[i][j] += metalStack[mIdx].label + " TAPERRULE LayerScaleRule ";
             routed[i][j] += " ( " + to_string(x1) + " " + to_string(y1) + " ) ";
             // if both end are the same, then it's a via
-            if (x1 == x2 && y1 == y2)   
+            if (x1 == x2 && y1 == y2)
             {
                 routed[i][j] += "M" + to_string(mIdx + 2) + "_M" + to_string(mIdx + 1);
                 continue;
@@ -58,7 +57,7 @@ void DEF_Writer::wireSize()
     // First vertical layer set as constant reference (same as LEF)
     nonDefWidth.push_back(metalStack[1].width);
     nonDefOffset.push_back(metalStack[1].offset);
-    
+
     // Adjust width and offset for remaining layers
     for (int i = 2; i < metalStack.size(); i++)
     {

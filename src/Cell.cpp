@@ -2,6 +2,9 @@
 Cell::Cell(){
     for (int i = 0 ; i < 4 ; i++) dir[i] = 0;
     cost = 0;
+    allowed = 0;
+    target = 0;
+    invobs = 0;
 }
 
 //Constructor
@@ -12,6 +15,9 @@ Cell::Cell(char _S, char _C){
     indi = -1;
     indj = -1;
     cost = 0;
+    allowed = 0;
+    target = 0;
+    invobs = 0;
 }
 
 //Setter for S
@@ -72,8 +78,9 @@ int Cell::getCost(){
 
 //increments the cost
 void Cell::incCost(int netind){
-    if (!cost || nets[nets.size()-1] != netind){
-        nets.push_back(netind);
+
+    if (!nets.size()|| nets[nets.size()-1] != netind){
+        if (netind != -1) nets.push_back(netind);
         ++cost;
     }
 }

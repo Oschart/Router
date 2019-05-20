@@ -15,6 +15,9 @@ private:
 public:
     Cell();
     Cell (char, char);
+    int allowed;
+    int target;
+    int invobs;
     bool dir[4];
     vector<int> nets; //indexes of the nets assigned to this
     void setS(char); //setters and getters

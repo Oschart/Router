@@ -2,13 +2,14 @@
 #include <stack>
 #include <chrono>
 #include "GGrid.h"
+#include "DGrid.h"
 #define INT_MAX 1000000000
 
 using namespace std;
 
 //helper array
 int dj[] = {-1, 1};
-
+DGrid dgrid;
 GGrid grid; //the maze
 int si, sj, sk, ti, tj, tk; //source and target coordinates
 Cell neighbor; //used for searching for the target and reconstructing the path
@@ -52,17 +53,18 @@ int getClosest(Cell source, vector<Cell>& targets, int indx){
 void update_grid(Cell cell){
     grid.grid[cell.getk()][cell.geti()][cell.getj()].setS(cell.getS());
     grid.grid[cell.getk()][cell.geti()][cell.getj()].setC(cell.getC());
+    grid.grid[cell.getk()][cell.geti()][cell.getj()].target = cell.target;
 }
 
 //step2 in the Soukup paper
-void step2 (stack<Cell>& RN, stack<Cell>& RO){
+void step5 (stack<Cell>& RN, stack<Cell>& RO){
     stack<Cell> news;
     while (!RN.empty()) {news.push(RN.top());  RN.pop();}
     while (!news.empty()) {RO.push(news.top()); news.pop();}
 }
 
 //step5 in the Soukup paper
-void step5 (stack<Cell>& RN, stack<Cell>& RO){
+void step2 (stack<Cell>& RN, stack<Cell>& RO){
     while (!RN.empty()) {RO.push(RN.top()); RN.pop();}
 }
 
@@ -86,6 +88,10 @@ void step3 (stack<Cell>& RN, stack<Cell>& RO, int& goto4, int& goto5, int& goto8
 
             //evaluating the neighbor
             int C = neighbor.getC(), S = neighbor.getS();
+            if (neighbor.target) { neighbor_traceback = 2 + 4*(i >= 2) - i; goto8 = 1; return;}
+            int dheight = dgrid.heights[neighbor.getk()];
+            int dwidth = dgrid.widths[neighbor.getk()];
+            if (neighbor.getCost()>= limit) continue;
             if (C == 2 || S == 7) continue;
             if (S == 6) { neighbor_traceback = 2 + 4*(i >= 2) - i; goto8 = 1; return;}
             if (C <= 0){ //DFS / Line Search phase
@@ -122,13 +128,18 @@ void steps67(stack<Cell>& RO, int& goto3, int& goto6, int& goto8){
 
         update_grid(neighbor);
         RO.push(neighbor);
+        if (dir == 3 && neighbor.getk() == 0 || dir == 4 && neighbor.getk() == grid.getLayers()-1){goto3 = 1; break;}
 
         if (dir < 3) neighbor = grid.grid[neighbor.getk()][neighbor.geti()+(metal_directions[neighbor.getk()])*dj[dir-1]][neighbor.getj()+((metal_directions[neighbor.getk()]==0)%2)*dj[dir-1]];
-        else neighbor = grid.grid[neighbor.getk() + (dir == 3? 1 : -1)][neighbor.geti()][neighbor.getj()];
+        else neighbor = grid.grid[neighbor.getk() + (dir == 3? -1 : 1)][neighbor.geti()][neighbor.getj()];
 
         int C = neighbor.getC();
         int S = neighbor.getS();
-        if (C == 2 || S == 7) {goto3 = 1; break;}
+        int dheight = dgrid.heights[neighbor.getk()];
+        int dwidth = dgrid.widths[neighbor.getk()];
+        if(neighbor.target){goto8 = 1; break;}
+        if (neighbor.getCost()>= limit) { goto3 = 1; break;}
+        if (C == 2 || S == 7 ) {goto3 = 1; break;}
         if (S == 6) {goto8 = 1; break;}
         if(abs(ti - neighbor.geti()) + abs(tj - neighbor.getj()) > abs(ti - RO.top().geti()) + abs(tj - RO.top().getj())){
             goto3 = 1;
@@ -142,8 +153,6 @@ vector<Cell> traceback() {
     vector<Cell> path;
     Cell father;
     path.push_back(neighbor);
-    neighbor.setS(10);
-    update_grid(neighbor);
     if (!first) {
         grid.grid[neighbor.getk()][neighbor.geti()][neighbor.getj()].incCost(netind);
         if (grid.grid[neighbor.getk()][neighbor.geti()][neighbor.getj()].getCost() == limit) {neighbor.setS(7); update_grid(neighbor);}
@@ -161,15 +170,12 @@ vector<Cell> traceback() {
         int leveli = neighbor.geti() + ((metal_directions[neighbor.getk()] == 0 || i > 1)? 0 : dj[i]);
         neighbor = grid.grid[levelk][leveli][levelj];
         int n_traceback = neighbor.getS();
-
         //denoting the route this cell belongs to
         if (n_traceback != 5){
             grid.grid[neighbor.getk()][neighbor.geti()][neighbor.getj()].incCost(netind);
             if (grid.grid[neighbor.getk()][neighbor.geti()][neighbor.getj()].getCost() == limit) {neighbor.setS(7); update_grid(neighbor);}
         }
         path.push_back(neighbor);
-        neighbor.setS(10);
-        update_grid(neighbor);
         neighbor_traceback = n_traceback;
 
         //found the source
@@ -188,22 +194,20 @@ vector<Cell> soukup_route(Cell source){
     source.setC(2);
     Cell target = targetCells[getClosest(source, targetCells, -1)];
     if (source.geti() == target.geti() && source.getj() == target.getj() && source.getk() == target.getk()){
-        source.setS(10);
-        update_grid(source);
         path.push_back(source);
         return path;
     }
     si = source.geti();
     sj = source.getj();
     sk = source.getk();
+
     make_target(target);
     update_grid(source);
 
     target.setC(0);
-    target.setS(6);
+    target.target = 1;
     update_grid(target);
     RN.push(source);
-
 
     //each goto flag marks the next step to execute
     int goto2 = 1, goto3 = 0, goto4 = 0,  goto5 = 0, goto6 = 0, goto8 = 0;

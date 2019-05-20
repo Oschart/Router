@@ -73,7 +73,7 @@ void GGrid::cleartens(){
     for (int k = 0 ; k < layers ; k++)
     for (int i = 0 ; i < height+2 ; i++)
     for (int j = 0 ; j < width+2 ; j++){
-        if (grid[k][i][j].getS() == 10) grid[k][i][j].setS(0);
+        grid[k][i][j].allowed = 0;
     }
 }
 
