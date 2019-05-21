@@ -19,6 +19,7 @@ vector <via> vias;
 vector <RECT> obs;
 vector<vector<vector<RECT> > > nets;
 vector <int> order;
+int netCount;
 
 string inDEF;
 
@@ -119,6 +120,7 @@ void readComponents(ifstream &read, int num){
 }
 
 void readNets(ifstream &read, int num){
+    netCount = num;
     string buf;
     vector <string> Buf;
 
@@ -654,16 +656,10 @@ bool readLEF(){
 	}
 	return 1;
 }
+
 /*
 int main(){
-    cout << readLEF() << endl;
-    cout << readDEF() << endl;
 
-    cout << nets.size() << endl;
-    cout << order.size() << endl << endl << endl;
-    for(int i =0; i < order.size(); i++)cout << order[i] << endl;
-
-    /*
     cout << "\nComponents Section\n";
     for(auto i = components.begin(); i != components.end(); i++){
         component t = i->second;
@@ -737,7 +733,6 @@ int main(){
             cout << "\t\tThis pin has NUM OF PORTS " << nets[i][j].size() << endl;
         }
     }
-    */
 }
 
 /*
