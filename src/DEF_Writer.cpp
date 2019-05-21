@@ -89,17 +89,16 @@ void DEF_Writer::write_DEF(string inFile)
         if (token.find("END COMPONENTS") != string::npos)
         {
             // Write a non-default rule section to override width and offset in the LEF
-            out << "NONDEFAULTRULES 1 ;" << endl;
+            out << "\nNONDEFAULTRULES 1 ;" << endl;
             out << "- LayerScaleRule " << endl;
             for (int i = 0; i < metalStack.size(); ++i)
             {
                 out << "+ LAYER " + metalStack[i].label + " WIDTH " + to_string(nonDefWidth[i]);
-                out << " OFFSET " + to_string(nonDefOffset[i]);
                 if (i == metalStack.size() - 1)
                     out << " ;";
                 out << endl;
             }
-            out << "END NONDEFAULTRULES " << endl;
+            out << "END NONDEFAULTRULES \n" << endl;
         }
         
         // Remove leading spaces
