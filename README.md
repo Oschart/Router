@@ -67,9 +67,10 @@ The routing process is as follows:
     - Implemented testing infrastructure (IO, Netlist generators, etc)    
     - Designed a theoretical model for performing Detailed Routing  
     - Developed a complete implementation for the Detailed Routing model       
-	- Parsed the layers and vias info from the LEF    
-	- Parsed design info from the DEF file     
-	- Parsing checking for some syntax errors   
+	- From the LEF: Parsed design info, metal layer and cut layers design rules, size, ports and obstrauction locations for each cell in the SCL
+	- From the DEF: Parsed design and technology info, parsed the components and nets of the design
+	- Mapping the relative locations of each port and obstructions in the design to actual locations in the core area based on the location and orientation of each cell component 
+	- Parser checks and points for some syntax errors/warnings
     - Fully implemented DEF_Writer 
 
 ***********************************************************************************************
