@@ -329,7 +329,6 @@ vector<vector<seg>> getSegments() {
             for (int l = 0; l < dgrid.grid[k].size(); l++) for (int m = 0 ; m < dgrid.grid[k][l].size(); m++) dgrid.grid[k][l][m].target = 0;
         }
         successnets.push_back(netlist[i].order);
-        cout << "net " << netlist[i].order << " success" << endl;
     }
 
     //processing wire segments
@@ -356,7 +355,6 @@ vector<vector<seg>> getSegments() {
 
 int main (){
     auto segs = getSegments();
-    cout << tracks[0] << " " << tracks[1] << endl;
     DEF_Writer writer(metalLayers, segs);
     writer.write_DEF(inDEF);
 
