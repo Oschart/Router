@@ -96,7 +96,7 @@ void DEF_Writer::write_DEF(string inFile)
             }
             out << "END NONDEFAULTRULES \n" << endl;
         }
-        
+
         // Remove leading spaces
         while (token[0] == ' ')
             token = token.substr(1);
@@ -109,8 +109,9 @@ void DEF_Writer::write_DEF(string inFile)
                 if (token.find(";") != string::npos)
                 {
                     out << token.substr(0, token.find(";")) << endl;
-                    out << "+ ROUTED " << routed[k][0] << endl;
-                    if (routed[k].size() == 1)
+
+                    if(routed[k].size() > 0) out << "+ ROUTED " << routed[k][0] << endl;
+                    if (routed[k].size() <= 1)
                         out << " ; \n";
                     for (int i = 1; i < routed[k].size(); ++i)
                     {
@@ -128,6 +129,6 @@ void DEF_Writer::write_DEF(string inFile)
             }
             out << "END NETS \n";
         }
-        
+
     }
 }
