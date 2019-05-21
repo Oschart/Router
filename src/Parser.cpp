@@ -18,6 +18,7 @@ vector <cut> cutLayers;
 vector <via> vias;
 vector <RECT> obs;
 vector<vector<vector<RECT> > > nets;
+vector <int> order;
 
 string inDEF;
 
@@ -123,8 +124,10 @@ void readNets(ifstream &read, int num){
 
     getline(read, buf);
     Buf = Extract(buf);
+    int index = -1;
     while(!(Buf.size() == 2 && Buf[0] == "END" && Buf[1] == "NETS")){
         if(Buf.size() == 2 && Buf[0] == "-"){
+            index++;
             vector<pair<string, string> > pins;
             bool routable = 1;
             do{
@@ -139,6 +142,8 @@ void readNets(ifstream &read, int num){
 
 
             if(routable){
+
+                order.push_back(index);
 
                 vector<vector<RECT> > pins_temp;
                 vector<RECT> rects_temp;
@@ -654,6 +659,76 @@ int main(){
     cout << readLEF() << endl;
     cout << readDEF() << endl;
 
+    cout << nets.size() << endl;
+    cout << order.size() << endl << endl << endl;
+    for(int i =0; i < order.size(); i++)cout << order[i] << endl;
+
+    /*
+    cout << "\nComponents Section\n";
+    for(auto i = components.begin(); i != components.end(); i++){
+        component t = i->second;
+        cout << t.instance << " from the cell " << t.macro << " . Positioned in " << t.x_pos << ", " << t.y_pos << " as " << t.orientation << endl;
+    }
+
+    cout << "\n\nNets Section\n";
+    for(int i = 0; i < nets.size(); i++){
+        cout << "NET #" << i + 1 << endl;
+        for(int j = 0; j < nets[i].size(); j++){
+            cout << "\tPORT #" << j + 1 << endl;
+            for(int k = 0; k < nets[i][j].size(); k++){
+                cout << "\t\tRECT @" << nets[i][j][k].metalLayer << " COO " << nets[i][j][k].x1 << " " << nets[i][j][k].y1 << " " << nets[i][j][k].x2 << " " << nets[i][j][k].y2 << endl;
+            }
+        }
+    }
+     cout << "\nObstructions Section\n";
+    for(int i = 0; i < obs.size(); i++){
+        cout << "In layer " << obs[i].metalLayer << " Rectangle " << obs[i].x1 << " " << obs[i].y1 << " " << obs[i].x2 << " " << obs[i].y2 << endl;
+    }
+
+    */
+    /*
+    cout << "LEF SECTION" << endl;
+    cout << "CHARS    " << LEF_FILE.bus_left << "    " << LEF_FILE.bus_right << endl;
+    cout << "Database units: " << LEF_FILE.unit << endl;
+
+    cout << "\nMETALS SECTION" << endl;
+       for(int i = 0; i < metalLayers.size(); i++){
+        cout << "metal layer #" << metalLayers[i].index << endl;
+        cout << "\tDirection:  " << metalLayers[i].dir << endl;
+        cout << "\tOffset = " << metalLayers[i].offset << " , Width = " << metalLayers[i].width << endl;
+        cout << "\tPitch = " << metalLayers[i].pitch << " , Spacing = " << metalLayers[i].spacing << endl;
+        //cout << "Num of Tracks = " << metalLayers[i].numTracks << endl;
+        cout << metalLayers[i].index << endl;
+        cout << metalLayers[i].offset << endl;
+        cout << metalLayers[i].pitch << endl;
+        cout << metalLayers[i].spacing << endl;
+        cout << metalLayers[i].width << endl;
+        cout << "FROM THE DEF" << endl;
+        cout << metalLayers[i].start << endl;
+        cout << metalLayers[i].numTracks << endl;
+        cout << metalLayers[i].step << endl;
+
+    }
+
+
+    cout << "\n\nMICROS SECTION" << endl;
+    for(auto i = macros.begin(); i != macros.end(); i++){
+        cout << "MACRO " << i->first << endl;
+        macro ty = i->second;
+        for(auto j = ty.pins.begin(); j != ty.pins.end(); j++){
+            cout << "\tPIN " << j->first << endl;
+            vector<RECT> vec = j->second.ports;
+            for(int k = 0; k < vec.size(); k++){
+                cout << "\t\tIn metal layer #" << vec[k].metalLayer << " RECT " << vec[k].x1 << " " << vec[k].y1 << " " << vec[k].x2 << " " << vec[k].y2 << endl;
+            }
+        }
+        cout << "\tObstruction" << endl;
+        for(int k = 0; k < ty.obs.size(); k++){
+            cout << "\t\tIn metal layer #" << ty.obs[k].metalLayer << " RECT " << ty.obs[k].x1 << " " << ty.obs[k].y1 << " " << ty.obs[k].x2 << " " << ty.obs[k].y2 << endl;
+        }
+
+    }
+
     cout << "\n\nNets Section\n";
     cout << "NUM OF NETS " << nets.size() << endl;
     for(int i = 0; i < nets.size(); i++){
@@ -662,6 +737,7 @@ int main(){
             cout << "\t\tThis pin has NUM OF PORTS " << nets[i][j].size() << endl;
         }
     }
+    */
 }
 
 /*
