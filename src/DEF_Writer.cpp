@@ -21,16 +21,16 @@ DEF_Writer::DEF_Writer(vector<metal> _metalStack, vector<vector<seg>> nets)
             int nextLayer = (mIdx < metalLayers.size() - 1 ? 1 : -1) + mIdx;
             if (mIdx % 2 == 0) // Horizontal
             {
-                x1 = nets[i][j].c1 + minX + nonDefOffset[nextLayer];
-                x2 = nets[i][j].c2 + minX + nonDefOffset[nextLayer];
-                y1 = y2 = nets[i][j].trackIdx + minY + nonDefOffset[mIdx];
+                x1 = nets[i][j].c1 + minX + metalStack[nextLayer].offset;
+                x2 = nets[i][j].c2 + minX + metalStack[nextLayer].offset;
+                y1 = y2 = nets[i][j].trackIdx + minY + metalStack[mIdx].offset;
                 same = 0;
             }
             else // Vertical
             {
-                x1 = x2 = nets[i][j].trackIdx + minX + nonDefOffset[mIdx];
-                y1 = nets[i][j].c1 + minY + nonDefOffset[nextLayer];
-                y2 = nets[i][j].c2 + minY + nonDefOffset[nextLayer];
+                x1 = x2 = nets[i][j].trackIdx + minX + metalStack[mIdx].offset;
+                y1 = nets[i][j].c1 + minY + metalStack[nextLayer].offset;
+                y2 = nets[i][j].c2 + minY + metalStack[nextLayer].offset;
                 same = 1;
             }
             routed[i][j] = ""; // Make sure it's an empty string
