@@ -53,10 +53,8 @@ void DEF_Writer::wireSize()
 {
     // First horizontal layer set as constant reference (same as LEF)
     nonDefWidth.push_back(metalStack[0].width);
-    nonDefOffset.push_back(metalStack[0].offset);
     // First vertical layer set as constant reference (same as LEF)
     nonDefWidth.push_back(metalStack[1].width);
-    nonDefOffset.push_back(metalStack[1].offset);
 
     // Adjust width and offset for remaining layers
     for (int i = 2; i < metalStack.size(); i++)
@@ -64,12 +62,10 @@ void DEF_Writer::wireSize()
         if (i % 2 == 0) // Horizontal
         {
             nonDefWidth.push_back(metalStack[i].width);
-            nonDefOffset.push_back(metalStack[i].offset);
         }
         else // Vertical
         {
             nonDefWidth.push_back(metalStack[i - 2].pitch + metalStack[i - 2].width);
-            nonDefOffset.push_back(metalStack[i - 2].offset + metalStack[i - 2].pitch / 2);
         }
     }
 }
