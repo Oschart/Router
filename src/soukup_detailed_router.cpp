@@ -11,8 +11,13 @@ using namespace std;
 int sdi, sdj, sdk, tdi, tdj, tdk; //source and target coordinates
 int mdirect;
 vector<Cell> dtargetCells; //the list of all possible current target
-vector<vector<seg>> segments;
+struct segnet {
+    vector<seg> segs;
+    int order;
+};
+vector<segnet> segments;
 vector<seg> current;
+
 
 int getNormalizedDistance(int i1, int j1, int k1, int i2, int j2, int k2){
     i1 *= (dgrid.heights[0]/dgrid.heights[k1]);
