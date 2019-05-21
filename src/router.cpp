@@ -18,11 +18,15 @@ struct lpin{
 struct net {
     vector<lpin> pins;
     int boxsize = 1;
+    int order;
 };
 
 //comparator function to sort nets in ascending order according to their bounding box size
 bool comp (net& a, net& b){ return a.boxsize < b.boxsize;}
-
+vector<int> successnets;
+bool comp2 (segnet& a, segnet& b){
+    return successnets[a.order] < successnets[b.order];
+}
 //generates 2D bounding box size for all nets in the netlist
 void generateBoxSizes(vector<net>& netlist){
     for (int i = 0 ; i < netlist.size(); i++){
@@ -92,6 +96,7 @@ vector<net>  parseNetlist(vector<vector<vector<Cell>>>& input){
             pin1.cells = input[i][j];
             net1.pins.push_back(pin1);
         }
+        net1.order = order[i];
         netlist.push_back(net1);
     }
     return netlist;
@@ -312,7 +317,8 @@ vector<vector<seg>> getSegments() {
         }
         if (fail) break;
         for (auto cell : dinitial_path){cell.setS(7); dupdate_grid(cell);}
-        segments.push_back(current);
+        segnet s; s.segs = current; s.order = i;
+        segments.push_back(s);
         current.clear();
         grid.cleartens();
         targetCells.clear();
@@ -322,23 +328,35 @@ vector<vector<seg>> getSegments() {
             for (int l = 0; l < grid.grid[k].size(); l++) for (int m = 0 ; m < grid.grid[k][l].size(); m++) grid.grid[k][l][m].target = 0;
             for (int l = 0; l < dgrid.grid[k].size(); l++) for (int m = 0 ; m < dgrid.grid[k][l].size(); m++) dgrid.grid[k][l][m].target = 0;
         }
-        cout << "net " << i << " success" << endl;
+        successnets.push_back(netlist[i].order);
+        cout << "net " << netlist[i].order << " success" << endl;
     }
 
     //processing wire segments
     for (int i = 0 ; i < segments.size(); i++){
-        for (int j = 0; j < segments[i].size(); j++){
-            cout << segments[i][j].metalLayer << " " << segments[i][j].trackIdx << " " << segments[i][j].c1 << " " << segments[i][j].c2 << endl;
-            segments[i][j].trackIdx *= metalLayers[segments[i][j].metalLayer].pitch;
-            segments[i][j].c1 *= metalLayers[segments[i][j].metalLayer + (segments[i][j].metalLayer == n_layers-1? -1 : 1)].pitch;
-            segments[i][j].c2 *= metalLayers[segments[i][j].metalLayer + (segments[i][j].metalLayer == n_layers-1? -1 : 1)].pitch;
+        for (int j = 0; j < segments[i].segs.size(); j++){
+            segments[i].segs[j].trackIdx *= metalLayers[segments[i].segs[j].metalLayer].pitch;
+            segments[i].segs[j].c1 *= metalLayers[segments[i].segs[j].metalLayer + (segments[i].segs[j].metalLayer == n_layers-1? -1 : 1)].pitch;
+            segments[i].segs[j].c2 *= metalLayers[segments[i].segs[j].metalLayer + (segments[i].segs[j].metalLayer == n_layers-1? -1 : 1)].pitch;
         }
     }
-    return segments;
+    sort(segments.begin(), segments.end(), comp2);
+    vector<vector<seg>> output;
+    int cur = 0;
+    for (int i = 0; i < netCount ; i++){
+        vector<seg> v;
+        if (i != successnets[segments[cur].order]) output.push_back(v);
+        else {
+            output.push_back(segments[cur].segs);
+            ++cur;
+        }
+    }
+    return output;
 }
 
 int main (){
     auto segs = getSegments();
+    cout << tracks[0] << " " << tracks[1] << endl;
     DEF_Writer writer(metalLayers, segs);
     writer.write_DEF(inDEF);
 
